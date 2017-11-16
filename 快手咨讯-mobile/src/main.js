@@ -1,0 +1,66 @@
+// The Vue build version to load with the `import` command
+// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+import Vue from 'vue'
+
+import $ from 'jquery'
+
+import App from './App'
+import router from './router'
+
+// 拖拽轮播图
+import wcSwiper from 'wc-swiper'
+import 'wc-swiper/style.css'
+Vue.use(wcSwiper);
+
+//导航栏按钮拖拽排序
+import VueDND from 'awe-dnd'
+Vue.use(VueDND)
+
+//样式重置
+import "../static/css/reset.css";
+import "../static/js/plugIn/rem.js";
+
+/*//表情插件
+import "../static/js/plugIn/smohan.face.js"
+import '../static/css/plugIn/smohan.face.css';*/
+
+//缩略图插件
+import '../static/js/plugIn/jqthumb.min.js';
+
+Vue.config.productionTip = false;
+
+// 图片懒加载
+import VueLazyload from 'vue-lazyload'
+Vue.use(VueLazyload, {
+  error: './static/images/error.png',//这个是请求失败后显示的图片
+  loading: './static/images/loading.gif',//这个是加载的loading过渡效果
+  attempt: 3,//尝试加载几次
+  listenEvents: [ 'scroll', 'mousewheel' ]
+});
+
+//config
+import Config from './components/Config'
+Vue.prototype.GLOBAL = Config
+
+/*import 'onsenui/css/onsenui.css'; // Webpack CSS import
+import 'onsenui/css/onsen-css-components.css'; // Webpack CSS import
+import VueOnsen from 'vue-onsenui';
+Vue.use(VueOnsen);*/
+
+/* eslint-disable no-new */
+new Vue({
+  el: '#app',
+  router,
+  template: '<App/>',
+  components: { App, },
+  data: {
+  	eventHub : new Vue
+  }
+})
+
+
+/*Vue.directive('title', {
+  inserted: function (el, binding) {
+    document.title = el.dataset.title
+  }
+})*/
