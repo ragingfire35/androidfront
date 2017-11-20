@@ -18,6 +18,7 @@
 	.Home{
 		margin-bottom: 1rem;
 	}
+
 	.nav-bar{
 		width: 100%;
 		background: #fff;
@@ -35,7 +36,7 @@
 		white-space: nowrap;
 		font-size: 0;
 		position: relative;
-		&>button{
+		&>li{
 			font-size: .14rem;
 			height: .5rem;
 			line-height: .5rem;
@@ -73,18 +74,32 @@
 	.home-main{
 		margin-top: .5rem;
 	}
-	.aa{
+	.carousel-img{
 		width: 3.3rem;
 		height: 1.8rem;
 		display: block;
 		margin: 0 auto;
 	}
+	.carousel-text{
+		font-size: .14rem;
+		height: .14rem;
+		color: #fff;
+		position: absolute;
+		left: 0;
+		right: 0;
+		margin: 0 auto;
+		bottom: .16rem;
+		padding: 0 .28rem;
+
+	}
+
 	.newsList{
-		padding: 0 .15rem;
-		margin-top: .2rem;
-		li{
+		width: 3.3rem;
+		margin: 0 auto;
+		.newsList_li{
 			overflow: hidden;
 			margin-bottom: .2rem;
+
 			&>a{
 				display: block;
 				width: 100%;
@@ -123,153 +138,108 @@
 
 		}
 	}
+	.load-more-news{
+		font-size: .14rem;
+		color: #FF8000;
+	}
+</style>
+<style>
+	.mint-cell-value {
+	    display: block!important;
+	}
+	.mint-cell-wrapper,.mint-cell-wrapper{
+		padding: .15rem!important;
+	}	
+	.mint-spinner-triple-bounce{
+		display: inline-block;
+	}
 </style>
 
 
 
 <template>	
-  <div class="Home">
+  <div class="Home" id='container'>
   	<div class="nav-bar">
-  		<div class="nav-btnBox">
-	  		<button v-for="item in navBtn" @click="btmLine($event)">{{item}}</button>
-	  		<div class="bottom-line"></div>
-  		</div>
-		<router-link to="/NavBtnSort" tag="button" class="nav-slideDown-btn"></router-link>
+  		<ul class="nav-btnBox">
+  			<li 
+  				v-for="item, index in category" 
+  				:class="{active:ACTIVE == index}"
+  				@click="btmLine($event), getNewsShow(item.id, index), active = active" 
+  				@click.once="getNowNews(item.id, index, item.category)"
+  			>{{item.category}}</li>
+
+	  		<div class="bottom-line" v-if="category.length"></div>
+  		</ul>
+		<router-link to="/NavBtnSort" tag="button" class="nav-slideDown-btn"  v-if="category.length"></router-link>
   	</div>
 	
 	<div class="home-main">
 		
-		<!-- // 在需要使用的 view 里面引入: -->
-		<wc-swiper>
-		    <wc-slide>
-		        <!-- // 这里放你需要轮播的内容, 比如一张图片 -->
-		        <img src="../../static/images/9776961_174126981000_2.jpg" alt="" class="aa">
+		<!-- // 在需要使用的 view 里面引入: lunbo-->
+		<wc-swiper  :autoplay='true' ref="swiper" :pagination="false" @transitionend="fn" v-if="banner.length">
+		    <wc-slide v-for="item, index in banner" :newsId = "item.news_id" key="index">
+		    	<!-- // 这里放你需要轮播的内容, 比如一张图片 -->
+				<div style="position:relative;">	
+					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
+						<img v-lazy.container="basePath + item.cover_img" alt="" class="carousel-img">
+						<p class="carousel-text">{{item.title}}</p>
+					</router-link>
+				</div>
 		    </wc-slide>
 		</wc-swiper>
-		 
-			<!-- 		// 循环列表
-			<wc-swiper>
-			   <wc-slide v-for="(slide, key) in slides" :key="key">
-			   </wc-slide>
-			</wc-swiper> -->
-							 
-					<!-- // 异步获取 slides 的时候, 需要在 wc-swiper 上面添加 v-if 判断 -->
-			<!-- 		<wc-swiper v-if="slides.length">
-			   <wc-slide v-for="(slide, key) in slides" :key="key">
-			   </wc-slide>
-			</wc-swiper> -->
-					 
-			<!-- 		// 带配置选项 -->
-			<!-- 		<wc-swiper :duration="900" :interval="2000" @transitionend="fn">
-			    <wc-slide>
-			        // 这里放你需要轮播的内容, 比如一张图片
-			    </wc-slide>
-			</wc-swiper> -->
-		
-		<ul class="newsList">
-			<li>
-				<a href="javascript:;">
-					<div class="newsLt">
-						<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
+		<mt-tab-container v-model="ACTIVE" swipeable id="tab-container">
+
+			<mt-tab-container-item 
+				class="wrapper"
+				v-for="nav, navIndex in category"
+				:id = "navIndex"
+	 			v-infinite-scroll="loadMore"
+	  			:infinite-scroll-disabled="loading"
+	  			infinite-scroll-distance="10"
+	  			infinite-scroll-immediate-check="false"
+				
+				
+			><!-- v-if= "navIndex == ACTIVE" -->
+				<mt-cell>
+					<ul class="newsList"> 
+						<li class="newsList_li" 
+							v-for="item, index in cateNews[navIndex]"
+
+						>
+							<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
+								<div class="newsLt">
+									<p class="news-tt">{{item.title}}</p>
+									<p class="news-author-info">
+										<span class="author-name">{{item.admin_id}}</span>
+										<span>&ensp;·&ensp;</span>
+										<span class="public-time" :data-timeago="parseInt(item.ctime+'000') | formatDate"></span>
+										<span>&ensp;·&ensp;</span>
+										<span class="news-source">{{item.source}}</span>
+									</p>
+								</div>
+								<div class="newsRt">
+									<img v-lazy.container="basePath + item.cover_img" alt="">
+								</div>
+							</router-link>
+						</li>
+					</ul>
+					<a href="javascript:;" class="load-more-news" v-if="navIndex == ACTIVE">
+						<p v-if="moreNewsBtn === true" @click="++newspageNumber[ACTIVE]"  @click.prevent="getNowNews(nav.id, navIndex)" class="load-more-newsBtn">
+							<span>更多</span>
+							<span class="load-news-name">{{nav.category}}新闻</span>
 						</p>
-					</div>
-					<div class="newsRt">
-						<img src="../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-					</div>
-				</a>
-			</li>
-			<li>
-				<a href="javascript:;">
-					<div class="newsLt">
-						<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
+						<p style="font-size:.16rem;" v-else-if="moreNewsBtn === false">
+							<span>加载中</span>
+							<mt-spinner type="triple-bounce" color="#FF8000"></mt-spinner>
+							
 						</p>
-					</div>
-					<div class="newsRt">
-						<img src="../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-					</div>
-				</a>
-			</li>
-			<li>
-				<a href="javascript:;">
-					<div class="newsLt">
-						<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
+						<p v-else-if="moreNewsBtn === ''">
+							<span>已无更多新闻</span>
 						</p>
-					</div>
-					<div class="newsRt">
-						<img src="../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-					</div>
-				</a>
-			</li>	
-			<li>
-				<a href="javascript:;">
-					<div class="newsLt">
-						<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
-						</p>
-					</div>
-					<div class="newsRt">
-						<img src="../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-					</div>
-				</a>
-			</li>
-			<li>
-				<a href="javascript:;">
-					<div class="newsLt">
-						<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
-						</p>
-					</div>
-					<div class="newsRt">
-						<img src="../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-					</div>
-				</a>
-			</li>
-			<li>
-				<a href="javascript:;">
-					<div class="newsLt">
-						<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
-						</p>
-					</div>
-					<div class="newsRt">
-						<img src="../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-					</div>
-				</a>
-			</li>
-		</ul>
+					</a>
+				</mt-cell>
+			</mt-tab-container-item>
+		</mt-tab-container>
 	</div>
   </div>
 </template>
@@ -277,41 +247,145 @@
 
 <script>
 	
-
+	import { Indicator } from 'mint-ui';
 	export default{
-
+		
 		data(){
 			return{
-				navBtn : [
-				    "热点",
-					"时事",
-					"国内",
-					"国际",
-					"社会",
-					"娱乐",
-					"科技",
-					"汽车",
-					"财经",
-					"军事",
-					"生活"
-				],
-				slidesList : [0 ,1],
-				list: [1,2]
+				active : '0',//预先指定显示的块，值必须字符串 //侧滑选项卡
+				ACTIVE : 0,
+				basePath : this.GLOBAL.__PUBLIC__ ,
+				banner : [],
+				category : [],
+				cateNews: [],
+				newspageNumber : [],
+				moreNewsBtn : false,
+				loading : false
 			}
 		},
 		components:{
 		},
+		watch: {
+			ACTIVE : function(val){
+				var $this = this;
+				$(".nav-btnBox li:eq("+val+")").trigger('click');
+			},
+			category : function(val){
+				for (var i = 0; i < val.length; i++) {
+					this.cateNews.push(new Array());
+					this.newspageNumber.push(1);
+				}
+			},
+			cateNews : function(){
+				var $this = this;
+				$(function(){
+					$this.GLOBAL.agoTime.render(document.querySelectorAll('.public-time'), 'zh_CN');
+				}) 
+			}
+		},
 		beforeCreate(){
 			var $this = this;
-			$this.$root.eventHub.$on('BackNavBtn', (navBtn)=>{
-					 $this.navBtn = navBtn;
-			});
 		},
 		mounted(){
-			$(".nav-btnBox button:eq(0)").addClass('active');
+			Indicator.open({
+			  text: '加载中...',
+			  spinnerType: 'fading-circle'
+			});
+			var $this = this;
 
+    /*			$(document).on("click", "[newsid]", function(e){
+				$(document).off("click", "[newsid]");
+				 var newsid = $(this).attr("newsid");
+				 $this.$router.push({'path' : "NewsDetails", 'query': {'newsid': newsid}});
+			});*/
+
+		    $.ajax({
+     		 	xhrFields: {
+                      withCredentials: true
+                },//跨域 后端存储session时，cookie不能用，发送此凭据
+		     	url: $this.GLOBAL.URL + "index.php/News/index",
+		     	type:"post", 
+		     	dataType: "json",
+		     	success:function(data){
+		     		$this.bannerFn(data.data.banner);
+		     		$this.categoryFn(data.data.category);
+		     		$this.newsFn(data.data.news);
+					Indicator.close();
+		     	}
+		    })
 		},
 		methods:{
+			loadMore() {
+			  var $this = this;
+			  $this.loading = true;
+			  setTimeout(() => {
+					$(".load-more-newsBtn").trigger('click');
+			    	$this.loading = false;
+			  }, 1000)
+			  	
+			},
+
+			bannerFn : function(data){
+				var $this = this;
+				$.each(data, function(i, j){
+					if( j.grade == "1" ){						
+						$this.banner.push( j )
+					}
+				});	
+			},
+			categoryFn : function(data){
+				this.category = data;
+			},
+			newsFn : function(data){
+				this.cateNews.push(data);
+				this.moreNewsBtn = true;
+			},
+			getNewsShow : function(showId, index){
+				var $this = this;		
+				$this.ACTIVE = index;		
+				$this.active = "'"+ index +"'";		
+			},
+			getNowNews : function(showId, index, category){
+				var $this = this;
+				var showNum = 6;
+				if(index == 0 && arguments.length !== 2) {
+					return;
+					//禁止已经预加载的新闻 ，对应的按钮可以点击
+				};	
+				$this.moreNewsBtn = false;
+				$this.getNewsShow(showId, index);
+			    $.ajax({
+	     		 	xhrFields: {
+	                      withCredentials: true
+	                },//跨域 后端存储session时，cookie不能用，发送此凭据
+			     	url: $this.GLOBAL.URL + "index.php/News/cate_news",
+			     	type:"post", 
+			     	dataType: "json",
+			     	data:{
+			     		category_id	: showId,
+			     		page : $this.newspageNumber[$this.ACTIVE],
+			     		showNum : showNum		
+			     	},
+			     	success:function(data){
+			     		if(data.data.length != 0){
+				     		$.each(data.data, function(i ,j){
+				     			$this.cateNews[index].push(j);
+				     		});	
+				     		showNum > data.data.length ?
+				     			$this.moreNewsBtn = "" :
+				     			$this.moreNewsBtn = true;	
+			     		} else {
+			     			$this.moreNewsBtn = '';	
+			     		}
+
+			     	}
+			    });		
+
+			},
+			fn : function(){
+/*				var $this = this;		
+				$this.ACTIVE = index;	*/		
+			},
 			btmLine : function(e){
 		        var boxL = $(".nav-btnBox").scrollLeft();
 		        var bgL = $(e.target).offset().left;
@@ -319,15 +393,15 @@
 		        var newL = bgL + boxL;
 		        $('.bottom-line').animate({left:newL+thisCenter},200);
 		        $(e.target).addClass('active').siblings('button').removeClass("active");
+		        if($(e.target).index() >= 5){	
+		        	$(".nav-btnBox").scrollLeft(10000);
+		        } else {
+		        	$(".nav-btnBox").scrollLeft(0);
+		        }
 			}
 		},
 
 		beforeDestroy(){
-			//通过this.$root.eventHub获取此对象
-			//调用$emit 方法
-			this.$root.eventHub.$off('BackNavBtn');
-			this.$root.eventHub.$emit('NavBtnSort', this.navBtn)	
-
 		}
 	}
 </script>

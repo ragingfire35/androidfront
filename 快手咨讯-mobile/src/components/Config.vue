@@ -1,5 +1,10 @@
 <script type="text/javascript">
-	var URL = 'http://192.168.8.105/';
+	//*** 时间前
+	import timeago from 'timeago.js';
+
+	var agoTime = timeago();
+	var URL = 'http://192.168.8.103/';
+	var __PUBLIC__ = URL + 'Public/';
 /*	window.localStorage.IsLoginIn  = 'false';
 	window.localStorage.user_head = "";
 	window.localStorage.user_nickName = "";*/
@@ -13,7 +18,9 @@
 	
 	export default
 	{
+	  agoTime,
 	  URL,
+	  __PUBLIC__
 	  //USER_INFO,
 	  //IsLoginIn
 	  //app_key,

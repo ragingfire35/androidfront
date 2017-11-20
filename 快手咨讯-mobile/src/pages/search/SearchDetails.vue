@@ -46,8 +46,27 @@
 			right: .16rem;
 		}
 	}
-	.theLatest-tt,
-	.history-tt
+	.search-response{
+		font-size: .14rem;
+		color: #FF8000;
+		text-align: left;
+		padding-left: .5rem;
+		position: relative;
+		&:before{
+			content: "";
+			display: block;
+			width: .3rem;
+			height: .24rem;
+			background: url("../../../static/images/general_btn_search_normal.png") center no-repeat;
+			background-size: 100% auto;	
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			margin: auto 0;
+			left: .14rem;
+		}
+	}
+	.response-tt
 	{
 		font-size: .12rem;
 		color: #a9a9a9;
@@ -56,7 +75,7 @@
 		text-align: left;
 		padding-left: .15rem;
 	}
-	.history-tt{
+	.response-tt{
 		height: .8rem;
 		line-height: .8rem;
 	}
@@ -81,15 +100,15 @@
 			font-size: .15rem;
 			font-weight: bold;
 			color: #303030;
-			line-height: .22rem;
-		
+			height: .38rem;
+			line-height: .22rem;		
 		}
 	}
 	.news-author-info{
 		color: #a8a8a8;
 		font-size: .12rem;
 		text-align: left;
-		margin-top: .08rem;
+		margin-top: .07rem;
 	}
 	.newsRt{
 		width: .94rem;
@@ -102,20 +121,10 @@
 
 		}
 	}
-	.history-list{
-		padding: 0 .15rem;
-		text-align: left;
-		li{
-			margin-bottom: .14rem;
-		}
-	}
-	.his-bt{
-		font-size: .15rem;
-		color: #000000;
-		font-weight: bold;
-		line-height: .24rem;
-		letter-spacing: .01rem;
-		text-align: justify;
+	.noStyle{
+		font-size: .14rem;
+		color: #FF8000;
+		display: none;
 	}
 </style>
 
@@ -126,134 +135,143 @@
   <div class="SearchDetails">
   	<div class="searchBox">
   		<em></em>
-  		<input type="text" placeholder="请输入要搜索的关键字">
-  		<button></button>
+  		<input type="text" placeholder="请输入要搜索的关键字" class="searchText" @input="isShowMsgFn($event)" v-model="message">
+  		<button @click="clearSearch"></button>
   	</div>
+
+  	<p @click = "getSearchText()" v-if="isSearchMsg === true" class="search-response">{{message}}</p>
+
 	<div class="search-details">
-		<div class="theLatest">
-			<p class="theLatest-tt">最新</p>
+
+		<div class="search-responseBOX" 
+			 v-for="(item, index) in newsDetails"
+			 v-if="item.newsResponse.length"
+		>
+			<p class="response-tt">{{item.info}}</p>
 			<ul class="newsList">
-				<li>
-					<a href="javascript:;">
+				<li	v-for="(list, indexIn) in item.newsResponse">
+					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
 						<div class="newsLt">
-							<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
+							<p class="news-tt">{{list.title}}</p>
 							<p class="news-author-info">
-								<span class="author-name">梁风</span>
+								<span class="author-name">{{list.admin_id}}</span>
 								<span>&ensp;·&ensp;</span>
-								<span class="public-time">32分钟前</span>
+								<span class="public-time" :data-timeago="parseInt(list.ctime+'000') | formatDate"></span>
 								<span>&ensp;·&ensp;</span>
-								<span class="news-source">今日头条</span>
+								<span class="news-source">{{list.source}}</span>
 							</p>
 						</div>
 						<div class="newsRt">
-							<img src="../../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
+							<img v-lazy="basePath + list.cover_img" alt="">
 						</div>
-					</a>
+					</router-link>
 				</li>
-				<li>
-					<a href="javascript:;">
-						<div class="newsLt">
-							<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-							<p class="news-author-info">
-								<span class="author-name">梁风</span>
-								<span>&ensp;·&ensp;</span>
-								<span class="public-time">32分钟前</span>
-								<span>&ensp;·&ensp;</span>
-								<span class="news-source">今日头条</span>
-							</p>
-						</div>
-						<div class="newsRt">
-							<img src="../../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-						</div>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<div class="newsLt">
-							<p class="news-tt">如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道</p>
-							<p class="news-author-info">
-								<span class="author-name">梁风</span>
-								<span>&ensp;·&ensp;</span>
-								<span class="public-time">32分钟前</span>
-								<span>&ensp;·&ensp;</span>
-								<span class="news-source">今日头条</span>
-							</p>
-						</div>
-						<div class="newsRt">
-							<img src="../../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
-						</div>
-					</a>
-				</li>	
 
 			</ul>
 		</div>
-
-		<div class="history-related">
-			<p class="history-tt">历史相关</p>
-			<ul class="history-list">
-				<li>
-					<a href="javascript:;">
-						<p class="his-bt">
-							人也厌烦被影评欺骗，来掀翻这烂片横行的世道人也厌烦被影评欺骗
-						</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
-						</p>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<p class="his-bt">
-							人也厌烦被影评欺骗，来掀翻这烂片横行的世道骗，来掀翻这烂
-						</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
-						</p>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<p class="his-bt">
-							人也厌烦被影评欺骗，来掀翻这烂片横行的世道
-						</p>
-						<p class="news-author-info">
-							<span class="author-name">梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="public-time">32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span class="news-source">今日头条</span>
-						</p>
-					</a>
-				</li>
-			</ul>
-		</div>
-
+		<p class="noStyle">没有搜到结果,换个试试~</p>
 	</div>
   </div>
 </template>
 
 
 <script>
+	import { Indicator } from 'mint-ui';
 	export default{
 		data(){
 			return{
-
+				basePath : this.GLOBAL.__PUBLIC__,
+				message : "",
+				isSearchMsg : false,
+				newsDetails : [
+					{
+						info : "最新",
+						newsResponse : []
+					},
+					{
+						info : "历史相关",
+						newsResponse : []
+					}
+				]
+				
 			}
 		},
 		components:{
-		},	
+		},
 		mounted(){
-			
+			this.getSearchText();
 		},
 		methods :{
+			clearSearch(){
+				this.isSearchMsg = false;
+				$(function(){
+					$(".searchBox input").val("");
+				})
+					
+			},	
+		    isShowMsgFn(e){		
+		    	var $this = this;
+				$(".noStyle").hide();		    	
+		    	if ($.trim( $(e.target).val() ).length == 0) {
+		    		$this.isSearchMsg = false;
+		    	} else{
+			    	setTimeout(function(){
+			    		$this.isSearchMsg = true;
+			    	},500);
+		    	}
+		    },
+			getSearchText(){
+	            Indicator.open({
+	              text: '加载中...',
+	              spinnerType: 'fading-circle'
+	            });
+				var $this = this;
+				$this.isSearchMsg = false;
+				$this.newsDetails[0].newsResponse = [];
+				$this.newsDetails[1].newsResponse = [];
+				var searchInfo = $(".searchText").val().length == 0 ? $this.$route.query.q : $(".searchText").val();
+
+			    $.ajax({
+	     		 	xhrFields: {
+	                      withCredentials: true
+	                },//跨域 后端存储session时，cookie不能用，发送此凭据
+			     	url: $this.GLOBAL.URL + "index.php/News/news_search",
+			     	type:"post", 
+			     	dataType: "json",
+			     	data:{
+			     		search: searchInfo,
+			     		page: "1",
+			     		showNum : "6"
+			     	},
+			     	success:function(data){
+			     		if(data.errno == 0){
+			     			if(data.data.length == 0){
+			     				$(".noStyle").show();
+			     				Indicator.close();
+			     				return;
+			     			} else {
+			     				$(".noStyle").hide();
+			     			}
+			     			var date = new Date().getTime();
+			     			var dataTime = date - 1 * 60 * 60 * 1000;//最新
+			     			$.each(data.data,function(i , j){
+		     					j.ctime * 1000 >= dataTime ?
+		     					   $this.newsDetails[0].newsResponse.push(j) : 
+		     					   $this.newsDetails[1].newsResponse.push(j)
+			     			});
+			     			window.localStorage.searchRecord += searchInfo +  "---";
+							$(function(){
+								$this.GLOBAL.agoTime.render(document.querySelectorAll('.public-time'), 'zh_CN');
+							});	
+							Indicator.close();
+			     		} else if(data.errno == 1){
+			     		} else if(data.errno == 2){
+			     		}
+			     	}
+			    });
+			}
+		},
+		watch:{
 		},
 		beforeDestroy(){
 		}

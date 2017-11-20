@@ -22,8 +22,7 @@
 			top: .1rem;
 			left: .15rem;
 			background: url("../../../static/images/general_btn_search_normal.png") center no-repeat;
-			background-size: 100% auto;
-		}
+			background-size: 100% auto;}
 		&>input{
 			width: 2.86rem;
 			height: .3rem;
@@ -43,24 +42,42 @@
 			line-height: .5rem; 
 		}
 	}
+	.search-text{
+		font-size: .14rem;
+		color: #FF8000;
+		text-align: left;
+		padding-left: .5rem;
+		position: relative;
+		&:before{
+			content: "";
+			display: block;
+			width: .3rem;
+			height: .24rem;
+			background: url("../../../static/images/general_btn_search_normal.png") center no-repeat;
+			background-size: 100% auto;	
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			margin: auto 0;
+			left: .14rem;
+		}
+	}
 	.search-list li{
 		height: .5rem;
 		line-height: .5rem;
-		&>a{
-			font-size: .14rem;
-			color: #777;
-			&>em{
-				width: .5rem;
-				height: .5rem;
-				float: left;
-				background: url("../../../static/images/porfilo_img_list_history.png") center no-repeat;
-				background-size: 100% auto;
-				margin-left: .08rem;
-			}
-			&>span{
-				float: left;
-				margin-left: -.05rem;
-			}
+		font-size: .14rem;
+		color: #777;
+		&>em{
+			width: .5rem;
+			height: .5rem;
+			float: left;
+			background: url("../../../static/images/porfilo_img_list_history.png") center no-repeat;
+			background-size: 100% auto;
+			margin-left: .08rem;
+		}
+		&>span{
+			float: left;
+			margin-left: -.05rem;
 		}
 	}
 	.clear-search{
@@ -77,6 +94,12 @@
 			display: block;
 			margin: 0 auto;
 		}
+		&>span{
+			display: block;
+			margin-top: .1rem;
+			font-size: .14rem;
+			color: #FF8000;
+		}
 	}
 </style>
 
@@ -87,26 +110,30 @@
   <div class="Search">
   	<div class="searchBox">
   		<em></em>
-  		<input type="text" placeholder="请输入要搜索的关键字">
-  		<button @click="goback">取消</button>
+  		<input 
+	  		type="text" 
+	  		placeholder="请输入要搜索的关键字" 
+	  		v-model.number="message" 
+	  		@input="isShowMsgFn($event)"
+  		>
+  		<button @click="clearSearchText">取消</button>
   	</div>
-  	<div class="search-main">
+  	<router-link tag="p" :to="{ path:'/Search/SearchDetails',query: {q: message } }" class="search-text" v-if="isSearchMsg" >{{message}}</router-link>
+  	<div class="search-main" v-else-if="clearSearch">
 	  	<ul class="search-list"> 
-	  		<li>
-	  			<router-link to="/Search/SearchDetails">
-		  			<em></em>
-		  			<span>快手为什么这么厉害？</span>	
-	  			</router-link>
-	  		</li>
-	  		<li>
-	  			<router-link to="/Search/SearchDetails">
-		  			<em></em>
-		  			<span>快手为什么这么厉害？</span>	
-	  			</router-link>
-	  		</li>
+	  		<router-link 
+	  			v-for="item in oldSearchList"
+	  			:to="{ path:'/Search/SearchDetails',query: {q: item } }" 
+	  			tag="li"
+	  			v-if = "item.length"
+	  		>
+	  			<em></em>
+	  			<span>{{item.replace(/undefined/, "")}}</span>
+  			</router-link>
 	  	</ul>
 	  	<p class="clear-search">
-	  		<button>清除历史搜索</button>
+	  		<button @click="crShHis(), noSearch = true" v-if="noSearch == false">清除历史搜索</button>
+	  		<span v-else>很干净哦~~</span>
 	  	</p>
 	  	<router-view></router-view>  
   	</div>
@@ -118,17 +145,54 @@
 	export default{
 		data(){
 			return{
-
+				oldSearchList : window.localStorage.searchRecord || [],
+				message:"",
+				isSearchMsg : false,
+				clearSearch : true,
+				noSearch : false
 			}
 		},
 		components:{
 		},	
 		mounted(){
-			
+			if(this.oldSearchList.length == 0) {
+				this.noSearch = true;
+				return;
+			}   
+			this.oldSearchList = window.localStorage.searchRecord.split("---").reverse();
+
+		},
+		watch:{
+			clearSearch(val){
+				$(function(){
+					$(".searchBox input").val("");
+				})
+				
+			}	
 		},
 		methods :{
 		    goback () {
 		      this.$router.goBack()
+		    },
+		    isShowMsgFn(e){
+
+		    	var $this = this;
+		    	$this.clearSearch = false;
+		    	if ($.trim( $(e.target).val() ).length == 0) {
+		    		$this.isSearchMsg = false;
+		    	} else{
+			    	setTimeout(function(){
+			    		$this.isSearchMsg = true;
+			    	},500);
+		    	}
+		    },
+		    clearSearchText(){		    	
+		    	this.isSearchMsg = false;
+		    	this.clearSearch = true;
+		    },
+		    crShHis(){
+		    	this.oldSearchList = [];
+		    	window.localStorage.removeItem("searchRecord");
 		    }
 		},
 		beforeDestroy(){

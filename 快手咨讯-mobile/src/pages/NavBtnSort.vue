@@ -108,9 +108,9 @@
   		<span class="sort-tt-2">长按单个分类可以根据自己的喜好排列分类顺序</span>
   	</p>
   	<div class="btnBox">
-  		<button  v-for="item in navBtn" v-dragging="{ item: item, list: navBtn, group: 'item'}" :key="item">{{item}}</button>
+  		<button  v-for="item,index in navBtn" v-dragging="{ item: item, list: navBtn, group: 'item'}" :key="item.id" :navBtnId=item.id>{{item.category}}</button>
   	</div>
-  	<router-link tag="button" to="/" class="confirm-btn" @click.native="isBackNavBtn = true">确定</router-link>
+  	<button class="confirm-btn" @click="btnSortFn($event)" v-if="isBtnLoad">确定</button>
   </div>
 </template>
 
@@ -121,31 +121,72 @@
 
 		data(){
 			return{
+				isBtnLoad : false,
 				navBtn: [],
-				exitBtn : [],
-				isBackNavBtn : false
+				exitBtn : []
 			}
 		},
 		components:{
 		},
 		beforeCreate(){
 
-			this.$root.eventHub.$on('NavBtnSort', (navBtn)=>{
+/*			this.$root.eventHub.$on('NavBtnSort', (navBtn)=>{
 					 this.navBtn = navBtn;
-			});
+			});*/
 		},
 		mounted(){
-
+			var $this = this;
+		    $.ajax({
+     		 	xhrFields: {
+                      withCredentials: true
+                },//跨域 后端存储session时，cookie不能用，发送此凭据
+		     	url: $this.GLOBAL.URL + "index.php/News/get_category",
+		     	type:"post", 
+		     	dataType: "json",
+		     	success:function(data){
+		     		if(data.errno == 0){
+		     		   $this.navBtn = data.data;
+		     		   $this.isBtnLoad = true;
+		     		} else if(data.errno == 1){
+		     			alert(data.errmsg);
+		     		} else if(data.errno == 2){
+		     			alert(data.errmsg);
+		     			$this.$router.push({"path" : "/loginIn"});
+		     		}
+		     	}
+		    });
 		},
 		methods:{
+			btnSortFn : function(e){
+				var cate_sort = new Array();
+				var $this = this;
+				$(".btnBox button").each(function(i , j){
+					cate_sort.push($(this).attr('navBtnId'));
+				});
+			    $.ajax({
+	     		 	xhrFields: {
+	                      withCredentials: true
+	                },//跨域 后端存储session时，cookie不能用，发送此凭据
+			     	url: $this.GLOBAL.URL + "index.php/News/cate_sort",
+			     	type:"post", 
+			     	dataType: "json",
+			     	data: {
+			     		cate_sort : cate_sort
+			     	},
+			     	success:function(data){
+			     		if(data.errno == 0){
+			     			$this.$router.push({"path" : "/"});
+			     		} else if(data.errno == 1){
+			     			alert(data.errmsg);
+			     			$this.$router.push({"path" : "/loginIn"});
+			     		}
+			     	}
+			    });
+			}
 		},
 		updated(){
 		},//data变化时
 		beforeDestroy(){
-			this.$root.eventHub.$off('NavBtnSort');
-			if(this.isBackNavBtn){
-				this.$root.eventHub.$emit('BackNavBtn', this.navBtn);
-			}
 			
 		}
 	}

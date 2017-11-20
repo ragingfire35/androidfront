@@ -12,6 +12,11 @@ import wcSwiper from 'wc-swiper'
 import 'wc-swiper/style.css'
 Vue.use(wcSwiper);
 
+//mint-ui
+import MintUI from 'mint-ui'
+import 'mint-ui/lib/style.css'
+Vue.use(MintUI)
+
 //导航栏按钮拖拽排序
 import VueDND from 'awe-dnd'
 Vue.use(VueDND)
@@ -24,12 +29,21 @@ import "../static/js/plugIn/rem.js";
 import "../static/js/plugIn/smohan.face.js"
 import '../static/css/plugIn/smohan.face.css';*/
 
+
 //缩略图插件
 import '../static/js/plugIn/jqthumb.min.js';
 
+//格式化时间
+import {formatDate} from '../static/js/plugIn/date.js';
+Vue.filter("formatDate", function(time){
+    let date = new Date( time );
+    return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
+});
+
+
 Vue.config.productionTip = false;
 
-// 图片懒加载
+/*// 图片懒加载
 import VueLazyload from 'vue-lazyload'
 Vue.use(VueLazyload, {
   error: './static/images/error.png',//这个是请求失败后显示的图片
@@ -37,7 +51,7 @@ Vue.use(VueLazyload, {
   attempt: 3,//尝试加载几次
   listenEvents: [ 'scroll', 'mousewheel' ]
 });
-
+*/
 //config
 import Config from './components/Config'
 Vue.prototype.GLOBAL = Config
