@@ -117,7 +117,7 @@ export default new Router({
             name: 'NewsDetails',
             component: NewsDetails,
             meta: {
-              footerShow : true
+              footerShow : false
             }
           },
           {

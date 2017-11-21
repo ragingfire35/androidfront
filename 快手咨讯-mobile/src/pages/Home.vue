@@ -176,8 +176,18 @@
 	<div class="home-main">
 		
 		<!-- // 在需要使用的 view 里面引入: lunbo-->
-		<wc-swiper  :autoplay='true' ref="swiper" :pagination="false" @transitionend="fn" v-if="banner.length">
-		    <wc-slide v-for="item, index in banner" :newsId = "item.news_id" key="index">
+		<wc-swiper  
+			:autoplay='true' 
+			ref="swiper" 
+			:pagination="false" 
+			@transitionend="fn" 
+			v-if="banner.length"
+		>
+		    <wc-slide 
+		    	v-for="item, index in banner" 
+		    	:newsId = "item.news_id" 
+		    	key="index"
+		    >
 		    	<!-- // 这里放你需要轮播的内容, 比如一张图片 -->
 				<div style="position:relative;">	
 					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">

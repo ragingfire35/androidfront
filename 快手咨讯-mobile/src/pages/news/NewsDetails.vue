@@ -200,20 +200,27 @@
     }
     .comment-inputBox{
     	width: 100%;
+    	height: 1rem;
 	    background-image: -webkit-linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%);
 	    background-image: -o-linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%);
 	    background-image: linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%); 
 	   	padding-top: .6rem;
 	   	padding-bottom: .16rem;
 	   	overflow: hidden;
+	   	position: fixed;
+	   	bottom: 0;
+	   	left: 0;
+	   	padding: .65rem .15rem 0 .15rem;
 	    em{
 	    	float: left;
+	    	border: 1px solid #ccc;
 	    }
 	    em,img{
 	    	display: block;
 	    	width: .24rem;
 	    	height: .24rem;
 	    	.baseBorderRadius(.24rem);
+
 	   }
 	   textarea{
 			width: 2.58rem;
@@ -238,27 +245,42 @@
 			margin-top: .05rem;
 	   }
     }
+    .more-comment{
+    	width: 100%;
+    	height: .24rem;
+    	line-height: .24rem;
+    	margin-bottom: 1rem;
+    	&>button{
+			background: transparent;
+			color: #FF8000;
+			display: block;
+			margin: 0 auto;
+    		&>span{
+				
+    		}
+    	}
+    }
 </style>
 <template>
 	<div class="news-details">
+		<go-back/>	
 		<p class="comment-fixed">
+			<go-back/>
 			<span>请大家关注文娱口和教育，合作微信：wxid_9415034150212战地小记者，带你看世界</span>
 		</p>
 		<p class="news-tt">
-			帮用户打发线下的闲暇时间，「共享娱乐」要做基于泛娱乐场景的时间技能共享平台
+			{{newsDetails.title}}
 		</p>
 		<p class="news-info">
-			<span>梁风</span>
+			<span>{{newsDetails.admin_id}}</span>
 			<span>&ensp;·&ensp;</span>
-			<span>32分钟前</span>
+			<span :data-timeago="parseInt(newsDetails.ctime+'000')|formatDate" class="news-time"></span>
 			<span>&ensp;·&ensp;</span>
-			<span>今日头条</span>
+			<span>{{newsDetails.source}}</span>
 		</p>
 		<em class="split-line"></em>
 		<p class="news-main">
-			继共享单车、共享空间、共享按摩椅等物权类共享产品后，共享经济市场又涌现出一批共享人时间和技能的平台。当时间与技能的共陌生人线下社交产生交集时，就诞生出一批例如万事屋、租我吧、HI区的社交平台。最近36氪接触到的一家平台“共享娱乐”也属于类，基于泛娱乐场景，通过共享用户碎片化时间，对接实现每个人的娱乐技能和共享价值。在该平台上，发布者需明确娱乐项目、时间、地点以及互动的奖励。是否奖励、奖励多少由用户自主
-			继共享单车、共享空间、共享按摩椅等物权类共享产品后，共享经济市场又涌现出一批共享人时间和技能的平台。当时间与技能的共陌生人线下社交产生交集时，就诞生出一批例如万事屋、租我吧、HI区的社交平台。最近36氪接触到的一家平台“共享娱乐”也属于类，基于泛娱乐场景，通过共享用户碎片化时间，对接实现每个人的娱乐技能和共享价值。在该平台上，发布者需明确娱乐项目、时间、地点以及互动的奖励。是否奖励、奖励多少由用户自主
-						
+			{{newsDetails.content}}			
 		</p>
 		<p class="author-tell">
 			原创文章，作者：毕果。转载或内容合作联系zhuanzai@kuainewskr.com；违规转载法律必究。寻求报道请加微信：kuainews。
@@ -290,66 +312,95 @@
 					<span>&nbsp;/&nbsp;</span>
 					<span>2017</span>条评论
 				</p>
-				<ul class="user-comment-List">
-					<li>
+				<ul 
+					class="user-comment-List"
+					v-infinite-scroll="loadMore"
+					infinite-scroll-disabled="loading"
+					infinite-scroll-distance="10"
+				>
+					<li v-for="item, index in commentArr">
 						<div class="user-head">
-							<img src="../../../static/images/edit_img_head_default.png" alt="">
+							<img :src="item.head_pic" alt="">
 						</div>
 						<div class="user-info">
 							<p>
-								<span class="user-name">网易新闻老油条</span>
-								<span class="user-comment-time">57分钟前</span>
+								<span class="user-name">{{item.nickname}}</span>
+								<span class="user-comment-time" :data-timeago= "parseInt(item.ctime+'000')|formatDate"></span>
 							</p>
-							<p class="user-comment">智能时代啊…我爱我的祖国，我爱我党！智能时代啊…我爱我的祖国，我爱我党！</p>
-						</div>
-					</li>
-					<li>
-						<div class="user-head">
-							<img src="../../../static/images/edit_img_head_default.png" alt="">
-						</div>
-						<div class="user-info">
-							<p>
-								<span class="user-name">网易新闻老油条</span>
-								<span class="user-comment-time">57分钟前</span>
-							</p>
-							<p class="user-comment">智能时代啊…我爱我的祖国，我爱我党！智能时代啊…我爱我的祖国，我爱我党！</p>
-						</div>
-					</li>
-					<li>
-						<div class="user-head">
-							<img src="../../../static/images/edit_img_head_default.png" alt="">
-						</div>
-						<div class="user-info">
-							<p>
-								<span class="user-name">网易新闻老油条</span>
-								<span class="user-comment-time">57分钟前</span>
-							</p>
-							<p class="user-comment">智能时代啊…我爱我的祖国，我爱我党！智能时代啊…我爱我的祖国，我爱我党！</p>
+							<p class="user-comment" v-html="item.content"></p>
 						</div>
 					</li>
 				</ul>
+				<div class="more-comment" style="">
+					<button @click="getOriginComment( ++moreCommentBtn )">更多<span>精彩评论</span></button>
+				</div>
 			</div>
 		</div>
 
 		<div class="comment-inputBox">
 			<em>
-				<img src="../../../static/images/edit_img_head_default.png" alt="">
+				<img :src="userHead" alt="">
 			</em>
-			<textarea placeholder="说出自己的看法..."></textarea>
-			<button>发送</button>
+			<textarea placeholder="说出自己的看法..." id="Smohan_text"></textarea>
+			<button @click="sendComment($event)">发送</button>
 		</div>
 	</div>
 </template>
 <script>
+	import { Toast, InfiniteScroll } from 'mint-ui';
+	import GoBack from '@/components/GoBack';
 	export default{
 		data(){
 			return {
-				textAreaFoucus : false
+				textAreaFoucus : false,
+				newsDetails : {},
+				commentArr : [],
+				userHead : window.localStorage.user_head,
+				moreCommentBtn : 1
+			}
+		},
+		components:{
+			GoBack
+		},
+		watch: {
+			newsDetails(){
+				var $this = this;
+				$(function(){
+					$this.GLOBAL.agoTime.render(document.querySelectorAll('.news-time'), 'zh_CN');
+				})
+			},
+			commentArr : function(){
+				var $this = this;
+				$(function(){
+					$this.GLOBAL.agoTime.render(document.querySelectorAll('.user-comment-time'), 'zh_CN');
+				})
 			}
 		},
 		mounted(){
 			var h = $(window).height();
-			$(window).resize(function(){
+			var $this = this;
+
+		    $.ajax({
+	 		 	xhrFields: {
+	                  withCredentials: true
+	            },//跨域 后端存储session时，cookie不能用，发送此凭据
+		     	url: $this.GLOBAL.URL + "index.php/News/new_detail",
+		     	data:{
+		     		news_id : $this.$route.query.newsid
+		     	},
+		     	type:"post", 
+		     	dataType: "json",
+		     	success:function(data){
+		     		if(data.errno == "0"){
+		     			$this.newsDetails = data.data;
+		     			$this.getOriginComment($this.moreCommentBtn);
+		     		} else {
+		     			//$(".more-comment").hide();
+		     		}
+		     	}
+		    });
+
+			/*$(window).resize(function(){
 				 if( $(window).height() < h ){
 				 	$(".user-comment-main").hide();
 				 	$(".comment-inputBox").css("padding", ".16rem 0 .16rem 0");
@@ -359,7 +410,7 @@
 				 }
 				
 				 
-			});
+			});*/
 
 			$(window).scroll(function(){
 				if( $(window).scrollTop() > $(".news-tt").offset().top){
@@ -370,8 +421,110 @@
 			})
 		},
 		methods:{
-			textArea : function(){
+			loadMore() {
+			  var $this = this;
+			  this.loading = true;
+			  setTimeout(() => {
+			  	$(".more-comment button").trigger('click');
+			    $this.loading = false;
+			  }, 2500);
+			},
+			sendComment :function(e){
+			 	var textArea = $("#Smohan_text");
+			    var $this = this;
+			    $(e.target).prop("disabled", true);
+				if($this.GLOBAL.IsLoginIn == 'false'){
+					alert("请先登录");
+					return;
+				}
+				var commentVal = {
+					head_pic : window.localStorage.user_head,
+					nickname : window.localStorage.user_nickName,
+					content :  $("#Smohan_text").val()
+				};
+				if(textArea.val() != ""){
 
+				     $.ajax({
+			 		 	xhrFields: {
+			                  withCredentials: true
+			            },//跨域 后端存储session时，cookie不能用，发送此凭据
+				     	url: $this.GLOBAL.URL + "index.php/News/add_comment",
+				     	data:{
+				     		news_id : $this.$route.query.newsid,
+				     		content : commentVal.content
+				     	},
+				     	type:"post", 
+				     	dataType: "json",
+				     	success:function(data){
+				     		$(e.target).prop("disabled", false);
+				     		$this.commentArr.unshift(commentVal);
+				     		$("#Smohan_text").val("");
+
+				     		if(data.errno == "0"){
+								let instance = Toast({
+									message : '发送成功',
+									position : "bottom"
+								});
+								setTimeout(() => {
+								  instance.close();
+								  
+								}, 2000);
+							 	
+				     		} else {
+				     			alert(data.errmsg);
+				     		}
+				     	}
+				     });
+				} else {
+					let instance = Toast({
+						message : '输入不能为空',
+						position : "bottom"
+					});
+					setTimeout(() => {
+					  instance.close();
+					  $(e.target).prop("disabled", false);
+					}, 2000);
+
+				}
+			},
+			getOriginComment : function(page, e){
+				if(page !== 1){
+					var btnHtml = $(".more-comment button").html();
+					$(".more-comment button").html("加载中...").prop("disabled", true);
+				};
+				var $this = this;
+			    $.ajax({
+		 		 	xhrFields: {
+		                  withCredentials: true
+		            },//跨域 后端存储session时，cookie不能用，发送此凭据
+			     	url: $this.GLOBAL.URL + "index.php/News/get_comment",
+			     	data:{
+			     		news_id : $this.$route.query.newsid,
+			     		showNum : 6,
+			     		page : page
+			     	},
+			     	type:"post", 
+			     	dataType: "json",
+			     	success:function(data){
+			     		if(data.errno == "0"){
+			     			if($this.commentArr.length != data.data.count){
+			     				$this.commentArr = $this.commentArr.concat(data.data.result);
+				     			if(page !== 1){
+				     				$(".more-comment button").html(btnHtml).prop("disabled", false);
+				     			} else {
+									$(".more-comment").show();
+				     			}	
+			     			} else {
+			     				$(".more-comment button").html("已无更多评论。");
+			     			}
+
+
+
+			     		} else {
+			     			alert(data.errmsg);
+			     		}
+			     	}
+			    });
 			}
 		}
 	}

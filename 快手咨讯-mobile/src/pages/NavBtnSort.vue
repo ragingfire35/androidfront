@@ -116,7 +116,7 @@
 
 
 <script>
-
+	import { Indicator } from 'mint-ui';
 	export default{
 
 		data(){
@@ -135,7 +135,12 @@
 			});*/
 		},
 		mounted(){
+			Indicator.open({
+			  text: '加载中...',
+			  spinnerType: 'fading-circle'
+			});
 			var $this = this;
+
 		    $.ajax({
      		 	xhrFields: {
                       withCredentials: true
@@ -144,6 +149,7 @@
 		     	type:"post", 
 		     	dataType: "json",
 		     	success:function(data){
+		     		Indicator.close();
 		     		if(data.errno == 0){
 		     		   $this.navBtn = data.data;
 		     		   $this.isBtnLoad = true;

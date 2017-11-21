@@ -38,6 +38,7 @@
     .look-main{
         width: 100%;
         overflow: hidden;
+        margin-top: .5rem;
     }
     .look-section{
         width: 100%;
@@ -148,7 +149,10 @@
         width: 100%;
         line-height: .5rem;
         font-size: .15rem;
-        color: #303030;       
+        color: #303030; 
+        position: fixed;
+        top: 0;
+        left: 0;      
         &>p{
             width: .68rem;
             margin: 0 auto;
@@ -172,6 +176,14 @@
         -webkit-transition:all 0.3s;
         transition:all 0.3s;
     }
+    .noStyle{
+        font-size: .14rem;
+        color: #ff8000;
+        margin-top: .6rem;
+        padding-top: .2rem;
+        border-top: 1px solid #ccc;
+        text-indent: .08rem;
+    }
 </style>
 <template>
     <div class="LookHistory">
@@ -181,11 +193,11 @@
             <button @click="dialogToggle" >清除全部</button>
         </div>
     	<div class="look-main">
-            <div class="look-section" v-for="(item,index) in list">
+            <div class="look-section" v-for="(item,index) in list" v-if="item.content.length">
                 <p v-if="item.content.length">{{item.lookTime}}</p>
                 <ul class="newsList">
                     <li v-for="(one, j) in item.content">
-                        <router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
+                        <router-link :to="{ path: '/NewsDetails', query: { newsid: one.news_id }}" href="javascript:;">
                             <div class="newsLt">
                                 <p class="news-tt">{{one.title}}</p>
                                 <p class="news-author-info">
@@ -205,13 +217,16 @@
                          </i>
                     </li>   
                 </ul>
-            </div>  
+            </div> 
+            <div v-else-if="item.content.length == 0 && index>0" class="noStyle" >
+                <span>很干净哦~</span>
+            </div> 
         </div>
         
         <div class="clearAll-box">
         	<div class="clearAll-dialog">
 	        	<p>确定要清空全部浏览历史？</p>
-	        	<button class="confirm-btn" @click="delTheDateBase(1, "");">确定</button>
+	        	<button class="confirm-btn" @click="delTheDateBase(1, '');">确定</button>
 	        	<button class="exit-btn" @click="dialogToggle">取消</button>
         	</div>
         </div>
@@ -286,7 +301,7 @@
                             x = event.changedTouches[0].pageX;
                         });
                         container[i].addEventListener('touchmove', function(event){
-                            // event.preventDefault()
+                            event.preventDefault()
                             X = event.changedTouches[0].pageX;                          
                                 //记录当前触控点横坐标
                             if($this.expansion){                                       

@@ -150,7 +150,7 @@
 			<p class="response-tt">{{item.info}}</p>
 			<ul class="newsList">
 				<li	v-for="(list, indexIn) in item.newsResponse">
-					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
+					<router-link :to="{ path: '/NewsDetails', query: { newsid: list.news_id }}" href="javascript:;">
 						<div class="newsLt">
 							<p class="news-tt">{{list.title}}</p>
 							<p class="news-author-info">

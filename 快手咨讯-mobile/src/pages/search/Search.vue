@@ -122,13 +122,13 @@
   	<div class="search-main" v-else-if="clearSearch">
 	  	<ul class="search-list"> 
 	  		<router-link 
-	  			v-for="item in oldSearchList"
+	  			v-for="item, index in oldSearchList"
 	  			:to="{ path:'/Search/SearchDetails',query: {q: item } }" 
 	  			tag="li"
 	  			v-if = "item.length"
 	  		>
 	  			<em></em>
-	  			<span>{{item.replace(/undefined/, "")}}</span>
+	  			<span>{{item}}</span>
   			</router-link>
 	  	</ul>
 	  	<p class="clear-search">
@@ -158,9 +158,10 @@
 			if(this.oldSearchList.length == 0) {
 				this.noSearch = true;
 				return;
-			}   
-			this.oldSearchList = window.localStorage.searchRecord.split("---").reverse();
-
+			} 
+			window.localStorage.searchRecord = window.localStorage.searchRecord.replace(/undefined/, "");
+			var arr = window.localStorage.searchRecord.split("---").reverse();
+			this.oldSearchList = this.unique3( arr );
 		},
 		watch:{
 			clearSearch(val){
@@ -171,6 +172,16 @@
 			}	
 		},
 		methods :{
+			unique3 : function(array){ 
+				var n = [array[0]]; //结果数组 
+				//从第二项开始遍历 
+				for(var i = 1; i < array.length; i++) { 
+					if (array.indexOf(array[i]) == i) n.push(array[i]); 				
+				}
+				return n;
+			}, 
+ 
+
 		    goback () {
 		      this.$router.goBack()
 		    },
