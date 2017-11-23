@@ -87,7 +87,7 @@
   	<p class="loginIn-h4">我们不制造新闻，<br/>我们只是&ensp;<span>新闻的搬运工</span>。</p>
 	<div class="loginIn-main">
 		<p class="phoneNum">
-			<input type="number" maxlength="11" placeholder="请输入手机号" class="phoneNumber">
+			<input type="number" maxLength="11" placeholder="请输入手机号" class="phoneNumber">
 		</p>
 		<p class="phoneCode">
 			<input type="number" maxlength="4" placeholder="请输入验证码" class="phoneCodeVal">
@@ -105,6 +105,7 @@
 
 
 <script>
+	import { Toast } from 'mint-ui';
 	export default{
 
 		data(){
@@ -175,7 +176,10 @@
 				     	}
 				     })
 				} else {
-					alert("手机号码不正确");
+					let instance = Toast({
+						message : '手机号码不正确',
+						position : "bottom"
+					});
 				}
 			},
 			loginIn: function(e){
@@ -183,7 +187,7 @@
 				var phoneCodeVal = $(".phoneCodeVal").val();
 				var $this = this;
 				if($this.isPhone(phoneVal) && $this.isPhoneCode(phoneCodeVal)){
-					$(e.target).prop("disabled", false).html("登录中...").css("background","#E5E5E5");
+					$(e.target).prop("disabled", true).html("登录中...").css("background","#E5E5E5");
 				    $.ajax({
 		     		 	xhrFields: {
 		                      withCredentials: true
@@ -197,7 +201,7 @@
 				     		"Vcode" : phoneCodeVal
 				     	},
 				     	success:function(data){
-				     		$(e.target).prop("disabled", true).html("登录").css("background","#FF8000");
+				     		$(e.target).prop("disabled", false).html("登录").css("background","#FF8000");
 				     		if(data.errno == 0){				     			
 								if(data.data.first_time == 1){
 									$this.$router.push({'path': '/PerfectAccount'})
@@ -206,18 +210,27 @@
 								}
 								
 				     		} else {
-				     			alert(data.errmsg);
+								let instance = Toast({
+									message : data.errmsg,
+									position : "bottom"
+								});
 				     		}
 				     	}
 				    })
 
 				} else {
 					if(!$this.isPhone(phoneVal)){
-						alert("手机号输入不正确");
+						let instance = Toast({
+							message : '手机号码不正确',
+							position : "bottom"
+						});
 						return;
 					}
 					if(!$this.isPhoneCode(phoneCodeVal)){
-						alert("验证码输入不正确")
+						let instance = Toast({
+							message : '验证码输入不正确',
+							position : "bottom"
+						});
 					}
 				}
 			},
@@ -228,7 +241,7 @@
 				data.data.sign == "" ? 
 				window.localStorage.user_sign = "暂无个人简介" : 
 				window.localStorage.user_sign = data.data.sign;
-				this.$router.push({'path': '/Personal'});
+				window.history.go(-1);
 			},
 		},
 

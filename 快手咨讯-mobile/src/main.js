@@ -30,28 +30,33 @@ import "../static/js/plugIn/smohan.face.js"
 import '../static/css/plugIn/smohan.face.css';*/
 
 
-//缩略图插件
-import '../static/js/plugIn/jqthumb.min.js';
 
-//格式化时间
-import {formatDate} from '../static/js/plugIn/date.js';
-Vue.filter("formatDate", function(time){
-    let date = new Date( time );
-    return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
-});
+//filter
+    //格式化时间
+    import {formatDate} from '../static/js/plugIn/date.js';
+    Vue.filter("formatDate", function(time){
+        let date = new Date( time );
+        return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
+    });
+    
+    // 字数截取
+    Vue.filter("subStrText", function(value,setTextNum){
+        if (value.length > setTextNum) {
+          var needText = value.substr(0, setTextNum) + "...";
+          return needText;
+        } else {
+          return value;
+        }
+    });
 
+
+//directive
+    // 处理图片
+    //缩略图插件
+    import '../static/js/plugIn/jqthumb.min.js';
 
 Vue.config.productionTip = false;
 
-/*// 图片懒加载
-import VueLazyload from 'vue-lazyload'
-Vue.use(VueLazyload, {
-  error: './static/images/error.png',//这个是请求失败后显示的图片
-  loading: './static/images/loading.gif',//这个是加载的loading过渡效果
-  attempt: 3,//尝试加载几次
-  listenEvents: [ 'scroll', 'mousewheel' ]
-});
-*/
 //config
 import Config from './components/Config'
 Vue.prototype.GLOBAL = Config

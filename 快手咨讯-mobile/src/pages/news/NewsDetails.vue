@@ -262,7 +262,7 @@
     }
 </style>
 <template>
-	<div class="news-details">
+	<div class="news-details" v-if="newsDetails.title">
 		<go-back/>	
 		<p class="comment-fixed">
 			<go-back/>
@@ -286,24 +286,24 @@
 			原创文章，作者：毕果。转载或内容合作联系zhuanzai@kuainewskr.com；违规转载法律必究。寻求报道请加微信：kuainews。
 		</p>
 		<div class="news-allComment">
-			<div class="author-home">
+			<div class="author-home" :v-if="authorInfo.length">
 				<div class="lt-info">
-					<img src="../../../static/images/edit_img_head_default.png" alt="">
+					<img v-lazy="basePath + authorInfo.head_pic" alt="">
 					<div class="lt-text">
 						<p>
-							<span>梁封</span>
+							<span>{{authorInfo.username}}</span>
 							<span>&ensp;·&ensp;</span>
 							<span>战地小记者</span>
 						</p>
 						<p>
-							共发表&ensp;<span>109</span>&ensp;篇
+							共发表&ensp;<span>{{authorInfo.count}}</span>&ensp;篇
 						</p>
 					</div>
-				</div>	
-				<button class="goToHome">
+				</div>
+				<router-link :to="{ path: '/AuthorDetails', query: { newsid: $route.query.newsid }}"  tag="button" class="goToHome">
 					去主页
 					<em></em>
-				</button>
+				</router-link>
 			</div>
 			
 			<div class="user-comment-main">
@@ -338,8 +338,8 @@
 		</div>
 
 		<div class="comment-inputBox">
-			<em>
-				<img :src="userHead" alt="">
+			<em v-if="commentArr.length">
+				<img v-lazy="userHead || commentArr[0].head_pic" alt="">
 			</em>
 			<textarea placeholder="说出自己的看法..." id="Smohan_text"></textarea>
 			<button @click="sendComment($event)">发送</button>
@@ -347,13 +347,15 @@
 	</div>
 </template>
 <script>
-	import { Toast, InfiniteScroll } from 'mint-ui';
+	import { Toast, InfiniteScroll, Indicator } from 'mint-ui';
 	import GoBack from '@/components/GoBack';
 	export default{
 		data(){
 			return {
+				basePath : this.GLOBAL.__PUBLIC__,
 				textAreaFoucus : false,
 				newsDetails : {},
+				authorInfo : {},
 				commentArr : [],
 				userHead : window.localStorage.user_head,
 				moreCommentBtn : 1
@@ -377,6 +379,10 @@
 			}
 		},
 		mounted(){
+            Indicator.open({
+              text: '加载中...',
+              spinnerType: 'fading-circle'
+            });
 			var h = $(window).height();
 			var $this = this;
 
@@ -393,6 +399,7 @@
 		     	success:function(data){
 		     		if(data.errno == "0"){
 		     			$this.newsDetails = data.data;
+		     			$this.author_detail();
 		     			$this.getOriginComment($this.moreCommentBtn);
 		     		} else {
 		     			//$(".more-comment").hide();
@@ -400,25 +407,25 @@
 		     	}
 		    });
 
-			/*$(window).resize(function(){
-				 if( $(window).height() < h ){
-				 	$(".user-comment-main").hide();
-				 	$(".comment-inputBox").css("padding", ".16rem 0 .16rem 0");
-				 } else {
-				   	$(".user-comment-main").show();	
-				   	$(".comment-inputBox").css("padding", ".6rem 0 .16rem 0");
-				 }
-				
-				 
-			});*/
+		    $(window).on({
+		    	"resize": function(){
+					if( $(window).height() < h ){
+					 	$(".user-comment-main").hide();
+					 	$(".comment-inputBox").css("padding", ".16rem 0 .16rem 0");
+					} else {
+					   	$(".user-comment-main").show();	
+					   	$(".comment-inputBox").css("padding", ".65rem .15rem 0 .15rem");
+					}
+		    	},
+		    	"scroll" : function(){
+					if( $(window).scrollTop() > $(".news-tt").offset().top){
+						$(".comment-fixed").show();	
+					} else {
+						$(".comment-fixed").hide();
+					}
+		    	}
 
-			$(window).scroll(function(){
-				if( $(window).scrollTop() > $(".news-tt").offset().top){
-					$(".comment-fixed").show();	
-				} else {
-					$(".comment-fixed").hide();
-				}
-			})
+		    });
 		},
 		methods:{
 			loadMore() {
@@ -433,8 +440,16 @@
 			 	var textArea = $("#Smohan_text");
 			    var $this = this;
 			    $(e.target).prop("disabled", true);
-				if($this.GLOBAL.IsLoginIn == 'false'){
-					alert("请先登录");
+				if(window.localStorage.IsLoginIn == 'false'){
+					let instance = Toast({
+						message : '请先登录',
+						position : "bottom"
+					});
+					$(e.target).prop("disabled", false);
+					
+					setTimeout(function(){
+						$this.$router.push({"path" : "/loginIn"})
+					},1000)
 					return;
 				}
 				var commentVal = {
@@ -507,6 +522,7 @@
 			     	dataType: "json",
 			     	success:function(data){
 			     		if(data.errno == "0"){
+			     			Indicator.close();
 			     			if($this.commentArr.length != data.data.count){
 			     				$this.commentArr = $this.commentArr.concat(data.data.result);
 				     			if(page !== 1){
@@ -525,7 +541,31 @@
 			     		}
 			     	}
 			    });
+			},
+			author_detail : function(){
+				var $this = this;
+			    $.ajax({
+		 		 	xhrFields: {
+		                  withCredentials: true
+		            },//跨域 后端存储session时，cookie不能用，发送此凭据
+			     	url: $this.GLOBAL.URL + "index.php/News/author_detail",
+			     	data:{
+			     		news_id : $this.$route.query.newsid
+			     	},
+			     	type:"post", 
+			     	dataType: "json",
+			     	success:function(data){
+			     		if(data.errno == "0"){
+			     			$this.authorInfo = data.data.admin_detail;
+
+			     		} else {
+			     		}
+			     	}
+			    });
 			}
+		},
+		beforeDestroy(){
+			$(window).off("scroll resize");
 		}
 	}
 </script>

@@ -90,7 +90,7 @@
 		margin: 0 auto;
 		bottom: .16rem;
 		padding: 0 .28rem;
-
+    	word-break: break-all;
 	}
 
 	.newsList{
@@ -118,7 +118,7 @@
 			font-weight: bold;
 			color: #303030;
 			line-height: .22rem;
-		
+			word-break: break-all;
 		}
 		.news-author-info{
 			color: #a8a8a8;
@@ -139,19 +139,36 @@
 		}
 	}
 	.load-more-news{
+		display: block;
 		font-size: .14rem;
 		color: #FF8000;
 	}
 </style>
 <style>
+	.mint-cell{
+		background: #fff!important;
+	}
 	.mint-cell-value {
 	    display: block!important;
+	    min-height: 3rem;
 	}
-	.mint-cell-wrapper,.mint-cell-wrapper{
+	.mint-cell-wrapper{
 		padding: .15rem!important;
+		background: #fff!important;
 	}	
 	.mint-spinner-triple-bounce{
 		display: inline-block;
+	}
+	.mint-loadmore-top{
+	    height: 100px;
+	    line-height: 80px;
+	    margin-top: -100px;
+	}
+	.mint-loadmore-top span
+	{
+		font-size: .14rem;
+		color: #FF8000;	
+		
 	}
 </style>
 
@@ -165,7 +182,8 @@
   				v-for="item, index in category" 
   				:class="{active:ACTIVE == index}"
   				@click="btmLine($event), getNewsShow(item.id, index), active = active" 
-  				@click.once="getNowNews(item.id, index, item.category)"
+  				@click.once="getNowNews(item.id, index, 0)"
+  				:showId = item.id
   			>{{item.category}}</li>
 
 	  		<div class="bottom-line" v-if="category.length"></div>
@@ -191,65 +209,73 @@
 		    	<!-- // 这里放你需要轮播的内容, 比如一张图片 -->
 				<div style="position:relative;">	
 					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
-						<img v-lazy.container="basePath + item.cover_img" alt="" class="carousel-img">
-						<p class="carousel-text">{{item.title}}</p>
+						<img v-lazy="basePath + item.cover_img" alt="" class="carousel-img">
+						<p class="carousel-text">{{item.title | subStrText(20)}}</p>
 					</router-link>
 				</div>
 		    </wc-slide>
 		</wc-swiper>
-		<mt-tab-container v-model="ACTIVE" swipeable id="tab-container">
+		<mt-loadmore 
+			:top-method="loadTop" 
+			@top-status-change="handleTopChange" 
+			ref="loadmore"
+			:maxDistance="100"
+		>
+			<mt-tab-container v-model="ACTIVE" swipeable id="tab-container" v-if="cateNews.length">
 
-			<mt-tab-container-item 
-				class="wrapper"
-				v-for="nav, navIndex in category"
-				:id = "navIndex"
-	 			v-infinite-scroll="loadMore"
-	  			:infinite-scroll-disabled="loading"
-	  			infinite-scroll-distance="10"
-	  			infinite-scroll-immediate-check="false"
-				
-				
-			><!-- v-if= "navIndex == ACTIVE" -->
-				<mt-cell>
-					<ul class="newsList"> 
-						<li class="newsList_li" 
-							v-for="item, index in cateNews[navIndex]"
+				<mt-tab-container-item 
+					class="wrapper"
+					v-for="nav, navIndex in category"
+					:id = "navIndex"
+					:key = 'navIndex'
+		 			v-infinite-scroll="loadMore"
+		  			:infinite-scroll-disabled="loading"
+		  			infinite-scroll-distance="10"
+		  			infinite-scroll-immediate-check="false"
+					
+					
+				><!-- v-if= "navIndex == ACTIVE" -->
+					<mt-cell>
+						<ul class="newsList"> 
+							<li class="newsList_li" 
+								v-for="item, index in cateNews[navIndex]"
 
-						>
-							<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
-								<div class="newsLt">
-									<p class="news-tt">{{item.title}}</p>
-									<p class="news-author-info">
-										<span class="author-name">{{item.admin_id}}</span>
-										<span>&ensp;·&ensp;</span>
-										<span class="public-time" :data-timeago="parseInt(item.ctime+'000') | formatDate"></span>
-										<span>&ensp;·&ensp;</span>
-										<span class="news-source">{{item.source}}</span>
-									</p>
-								</div>
-								<div class="newsRt">
-									<img v-lazy.container="basePath + item.cover_img" alt="">
-								</div>
-							</router-link>
-						</li>
-					</ul>
-					<a href="javascript:;" class="load-more-news" v-if="navIndex == ACTIVE">
-						<p v-if="moreNewsBtn === true" @click="++newspageNumber[ACTIVE]"  @click.prevent="getNowNews(nav.id, navIndex)" class="load-more-newsBtn">
-							<span>更多</span>
-							<span class="load-news-name">{{nav.category}}新闻</span>
-						</p>
-						<p style="font-size:.16rem;" v-else-if="moreNewsBtn === false">
-							<span>加载中</span>
-							<mt-spinner type="triple-bounce" color="#FF8000"></mt-spinner>
-							
-						</p>
-						<p v-else-if="moreNewsBtn === ''">
-							<span>已无更多新闻</span>
-						</p>
-					</a>
-				</mt-cell>
-			</mt-tab-container-item>
-		</mt-tab-container>
+							>
+								<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
+									<div class="newsLt">
+										<p class="news-tt">{{item.title | subStrText(28)}}</p>
+										<p class="news-author-info">
+											<span class="author-name">{{item.admin_id}}</span>
+											<span>&ensp;·&ensp;</span>
+											<span class="public-time" :data-timeago="parseInt(item.ctime+'000') | formatDate"></span>
+											<span>&ensp;·&ensp;</span>
+											<span class="news-source">{{item.source}}</span>
+										</p>
+									</div>
+									<div class="newsRt">
+										<img v-lazy="basePath + item.cover_img" alt="">
+									</div>
+								</router-link>
+							</li>
+						</ul>
+						<a href="javascript:;" class="load-more-news" v-if="navIndex == ACTIVE">
+							<p v-if="moreNewsBtn === true" @click="++newspageNumber[ACTIVE]"  @click.prevent="getNowNews(nav.id, navIndex)" class="load-more-newsBtn">
+								<span>更多</span>
+								<span class="load-news-name">{{nav.category}}新闻</span>
+							</p>
+							<p style="font-size:.16rem;" v-else-if="moreNewsBtn === false">
+								<span>加载中</span>
+								<mt-spinner type="triple-bounce" color="#FF8000"></mt-spinner>
+								
+							</p>
+							<p v-else-if="moreNewsBtn === ''">
+								<span>已无更多新闻</span>
+							</p>
+						</a>						
+					</mt-cell>
+				</mt-tab-container-item>
+			</mt-tab-container>
+		</mt-loadmore>	
 	</div>
   </div>
 </template>
@@ -257,11 +283,11 @@
 
 <script>
 	
-	import { Indicator } from 'mint-ui';
+	import { Indicator, Loadmore, Toast } from 'mint-ui';
 	export default{
 		
 		data(){
-			return{
+			return{				
 				active : '0',//预先指定显示的块，值必须字符串 //侧滑选项卡
 				ACTIVE : 0,
 				basePath : this.GLOBAL.__PUBLIC__ ,
@@ -270,7 +296,9 @@
 				cateNews: [],
 				newspageNumber : [],
 				moreNewsBtn : false,
-				loading : false
+				loading : false,
+				topStatus : '',
+				allLoaded: false,
 			}
 		},
 		components:{
@@ -283,14 +311,18 @@
 			category : function(val){
 				for (var i = 0; i < val.length; i++) {
 					this.cateNews.push(new Array());
-					this.newspageNumber.push(1);
+					this.newspageNumber.push(1);					
 				}
+				
 			},
 			cateNews : function(){
 				var $this = this;
 				$(function(){
 					$this.GLOBAL.agoTime.render(document.querySelectorAll('.public-time'), 'zh_CN');
 				}) 
+			},
+			topStatus(status) {
+				this.topStatus = status;
 			}
 		},
 		beforeCreate(){
@@ -303,7 +335,7 @@
 			});
 			var $this = this;
 
-    /*			$(document).on("click", "[newsid]", function(e){
+   			 /*$(document).on("click", "[newsid]", function(e){
 				$(document).off("click", "[newsid]");
 				 var newsid = $(this).attr("newsid");
 				 $this.$router.push({'path' : "NewsDetails", 'query': {'newsid': newsid}});
@@ -329,12 +361,23 @@
 			  var $this = this;
 			  $this.loading = true;
 			  setTimeout(() => {
-					$(".load-more-newsBtn").trigger('click');
-			    	$this.loading = false;
+					$(".load-more-newsBtn").trigger('click');   
+					$this.loading = false; 	
 			  }, 1000)
 			  	
 			},
+			loadTop(){
+				var selector = $(".nav-btnBox li:eq("+this.ACTIVE+")");
+				var index = selector.index();
+				var showId = selector.attr("showId");
+				window.sessionStorage.recordIndex = index;
+				this.getNowNews(showId, index, 1, 1);
 
+			},
+
+			handleTopChange(status) {
+	        	this.topStatus = status;
+	      	},
 			bannerFn : function(data){
 				var $this = this;
 				$.each(data, function(i, j){
@@ -345,6 +388,11 @@
 			},
 			categoryFn : function(data){
 				this.category = data;
+				$(function(){
+					var index = window.sessionStorage.recordIndex;
+					$(".nav-btnBox li:eq("+parseInt(index)+")").trigger("click");
+				})
+				
 			},
 			newsFn : function(data){
 				this.cateNews.push(data);
@@ -355,10 +403,10 @@
 				$this.ACTIVE = index;		
 				$this.active = "'"+ index +"'";		
 			},
-			getNowNews : function(showId, index, category){
+			getNowNews : function(showId, index, flag, page){
 				var $this = this;
 				var showNum = 6;
-				if(index == 0 && arguments.length !== 2) {
+				if(index == 0 && flag == 0) {
 					return;
 					//禁止已经预加载的新闻 ，对应的按钮可以点击
 				};	
@@ -373,11 +421,19 @@
 			     	dataType: "json",
 			     	data:{
 			     		category_id	: showId,
-			     		page : $this.newspageNumber[$this.ACTIVE],
+			     		page : page || $this.newspageNumber[$this.ACTIVE],
 			     		showNum : showNum		
 			     	},
 			     	success:function(data){
 			     		if(data.data.length != 0){
+			     			if(flag == 1){
+			     				$this.cateNews[index] = [];
+								$this.$refs.loadmore.onTopLoaded();
+								let instance = Toast({
+									message : "刷新成功",
+									position : "bottom"
+								});
+			     			}
 				     		$.each(data.data, function(i ,j){
 				     			$this.cateNews[index].push(j);
 				     		});	

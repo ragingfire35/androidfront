@@ -101,7 +101,8 @@
 			font-weight: bold;
 			color: #303030;
 			height: .38rem;
-			line-height: .22rem;		
+			line-height: .22rem;
+			word-break: break-all;		
 		}
 	}
 	.news-author-info{
@@ -152,7 +153,7 @@
 				<li	v-for="(list, indexIn) in item.newsResponse">
 					<router-link :to="{ path: '/NewsDetails', query: { newsid: list.news_id }}" href="javascript:;">
 						<div class="newsLt">
-							<p class="news-tt">{{list.title}}</p>
+							<p class="news-tt">{{list.title | subStrText(28)}}</p>
 							<p class="news-author-info">
 								<span class="author-name">{{list.admin_id}}</span>
 								<span>&ensp;·&ensp;</span>

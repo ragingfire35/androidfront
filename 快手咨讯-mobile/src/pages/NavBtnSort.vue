@@ -57,6 +57,10 @@
 			float: left;
 			margin-bottom: .15rem;
 			transition: transform .3s;
+			&:nth-of-type(1){
+				background: #eee;
+				color: #fff;
+			}
 			&:nth-of-type(4n-3){
 				margin-left: 0;
 			}
@@ -107,7 +111,8 @@
   		<span class="sort-tt-1">编辑分类排序</span>
   		<span class="sort-tt-2">长按单个分类可以根据自己的喜好排列分类顺序</span>
   	</p>
-  	<div class="btnBox">
+  	<div class="btnBox" v-if="navBtn.length">
+  		<button class="staticBtn" :navBtnId=staticBtn.id>{{staticBtn.category}}</button>
   		<button  v-for="item,index in navBtn" v-dragging="{ item: item, list: navBtn, group: 'item'}" :key="item.id" :navBtnId=item.id>{{item.category}}</button>
   	</div>
   	<button class="confirm-btn" @click="btnSortFn($event)" v-if="isBtnLoad">确定</button>
@@ -116,13 +121,14 @@
 
 
 <script>
-	import { Indicator } from 'mint-ui';
+	import { Indicator, Toast } from 'mint-ui';
 	export default{
 
 		data(){
 			return{
 				isBtnLoad : false,
 				navBtn: [],
+				staticBtn : [],//热点禁止拖拽
 				exitBtn : []
 			}
 		},
@@ -151,14 +157,27 @@
 		     	success:function(data){
 		     		Indicator.close();
 		     		if(data.errno == 0){
-		     		   $this.navBtn = data.data;
+		     		   $this.staticBtn = data.data[0] //热点禁止拖拽
+		     		   $.each(data.data, function(i , j){
+		     		   		if(i!= 0){
+		     		   			$this.navBtn.push(j);
+		     		   		}
+		     		   });
+		     		   
 		     		   $this.isBtnLoad = true;
 		     		} else if(data.errno == 1){
 		     			alert(data.errmsg);
 		     		} else if(data.errno == 2){
-		     			alert(data.errmsg);
+						let instance = Toast({
+							message : data.errmsg,
+							position : "bottom"
+						});
 		     			$this.$router.push({"path" : "/loginIn"});
 		     		}
+		     	},
+		     	error: function(){
+		     		alert("系统文章")
+		     		Indicator.close();
 		     	}
 		    });
 		},

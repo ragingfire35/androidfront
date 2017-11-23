@@ -14,7 +14,7 @@
 			left: 0;
 			text-align: left;
 			padding: 0 .15rem;
-			/* text-shadow: .01rem .01rem 0rem #000; */
+			text-shadow: .01rem .01rem 0rem #000;
 			.author-name{
 				color: #fff;
 				width: 100%;
@@ -65,6 +65,7 @@
 		font-size: .15rem;
 		color: #303030;
 		letter-spacing: .01rem;
+		word-break: break-all;
 	}
 	.publicNews-info{
 		margin-top: .1rem;
@@ -73,12 +74,12 @@
 	}
 </style>
 <template>
-	<div class="author-details">
+	<div class="author-details" v-if="authorInfo.username">
 		<div class="banner">
-			<img src="../../../static/images/t01c4b80a2e31d1eec0.jpg" alt="">
+			<img v-lazy="basePath + authorInfo.head_pic" alt="">
 			<div class="author-info">
 				<p class="author-name">
-					<span>梁风</span>
+					<span>{{authorInfo.username}}</span>
 					<span>战地小记者</span>
 				</p>
 				<p class="author-comment">
@@ -90,89 +91,66 @@
 
 		<div class="author-publicNews">
 			<p class="publicNews-num">
-				共发表&ensp;<span>109</span>&ensp;篇
+				共发表&ensp;<span>{{authorInfo.count}}</span>&ensp;篇
 			</p>
 			<ul class="publicNews-main">
-				<li>
-					<a href="javascript:;">
+				<li v-for="(item, index) in authorDetail">
+					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" >
 						<p class="publicNews-tt">
-							如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道
+							{{item.title | subStrText(40)}}
 						</p>
 						<p class="publicNews-info">
-							<span>梁风</span>
+							<span>{{item.admin_id}}</span>
 							<span>&ensp;·&ensp;</span>
-							<span>32分钟前</span>
+							<span :data-timeago= "parseInt(item.ctime+'000')|formatDate" class="a_public_time"></span>
 							<span>&ensp;·&ensp;</span>
-							<span>今日头条</span>
+							<span>{{item.source}}</span>
 						</p>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<p class="publicNews-tt">
-							如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道
-						</p>
-						<p class="publicNews-info">
-							<span>梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span>32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span>今日头条</span>
-						</p>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<p class="publicNews-tt">
-							如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道
-						</p>
-						<p class="publicNews-info">
-							<span>梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span>32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span>今日头条</span>
-						</p>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<p class="publicNews-tt">
-							如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道
-						</p>
-						<p class="publicNews-info">
-							<span>梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span>32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span>今日头条</span>
-						</p>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<p class="publicNews-tt">
-							如果你也厌烦被影评欺骗，来掀翻这烂片横行的世道
-						</p>
-						<p class="publicNews-info">
-							<span>梁风</span>
-							<span>&ensp;·&ensp;</span>
-							<span>32分钟前</span>
-							<span>&ensp;·&ensp;</span>
-							<span>今日头条</span>
-						</p>
-					</a>
+					</router-link>
 				</li>
 			</ul>
 		</div>
 	</div>
 </template>
 <script>
+	import { Indicator } from 'mint-ui';
 	export default{
 		data(){
 			return {
-
+				basePath : this.GLOBAL.__PUBLIC__,
+				authorInfo : {},
+				authorDetail : []
 			}
+		},
+		mounted(){
+            Indicator.open({
+              text: '加载中...',
+              spinnerType: 'fading-circle'
+            });
+			var $this = this;
+		    $.ajax({
+	 		 	xhrFields: {
+	                  withCredentials: true
+	            },//跨域 后端存储session时，cookie不能用，发送此凭据
+		     	url: $this.GLOBAL.URL + "index.php/News/author_detail",
+		     	data:{
+		     		news_id : $this.$route.query.newsid
+		     	},
+		     	type:"post", 
+		     	dataType: "json",
+		     	success:function(data){
+		     		if(data.errno == "0"){
+		     			Indicator.close();
+		     			$this.authorInfo = data.data.admin_detail;
+		     			$this.authorDetail = data.data.news_list;
+		     		
+						$(function(){
+							$this.GLOBAL.agoTime.render(document.querySelectorAll('.a_public_time'), 'zh_CN');
+						})
+		     		} else {
+		     		}
+		     	}
+		    });
 		}
 	}
 </script>

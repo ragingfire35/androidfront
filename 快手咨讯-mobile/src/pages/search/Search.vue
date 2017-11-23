@@ -124,6 +124,7 @@
 	  		<router-link 
 	  			v-for="item, index in oldSearchList"
 	  			:to="{ path:'/Search/SearchDetails',query: {q: item } }" 
+	  			:key="index"
 	  			tag="li"
 	  			v-if = "item.length"
 	  		>

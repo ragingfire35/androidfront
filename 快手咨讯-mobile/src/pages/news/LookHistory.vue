@@ -102,6 +102,7 @@
             color: #303030;
             line-height: .22rem;
             margin-top: -.04rem;
+            word-break: break-all;
         }
     }
     .news-author-info{
@@ -192,14 +193,14 @@
             <p>浏览历史</p>
             <button @click="dialogToggle" >清除全部</button>
         </div>
-    	<div class="look-main">
-            <div class="look-section" v-for="(item,index) in list" v-if="item.content.length">
+    	<div class="look-main" v-if="isShow === true">
+            <div class="look-section" v-for="(item,index) in list">
                 <p v-if="item.content.length">{{item.lookTime}}</p>
                 <ul class="newsList">
                     <li v-for="(one, j) in item.content">
                         <router-link :to="{ path: '/NewsDetails', query: { newsid: one.news_id }}" href="javascript:;">
                             <div class="newsLt">
-                                <p class="news-tt">{{one.title}}</p>
+                                <p class="news-tt">{{one.title | subStrText(28)}}</p>
                                 <p class="news-author-info">
                                     <span class="author-name">{{one.admin_id}}</span>
                                     <span>&ensp;·&ensp;</span>
@@ -218,11 +219,12 @@
                     </li>   
                 </ul>
             </div> 
-            <div v-else-if="item.content.length == 0 && index>0" class="noStyle" >
-                <span>很干净哦~</span>
-            </div> 
         </div>
-        
+
+        <div v-else-if="isShow === false" class="noStyle" >
+            <span>很干净哦~</span>
+        </div> 
+
         <div class="clearAll-box">
         	<div class="clearAll-dialog">
 	        	<p>确定要清空全部浏览历史？</p>
@@ -235,11 +237,12 @@
 
 <script>
     import GoBack from '@/components/GoBack';
-    import { Indicator } from 'mint-ui';
+    import { Indicator,Toast } from 'mint-ui';
     export default{
         data(){
         	return{
                 basePath : this.GLOBAL.__PUBLIC__,
+                isShow : true,
 	            list:[
                         {
                             lookTime : '今天',
@@ -256,6 +259,13 @@
         },
         components:{
             GoBack
+        },
+        watch:{
+            list(val){
+                if(this.list.length == 0){
+                    this.isShow = false;
+                }
+            }
         },
         mounted:function(){
             Indicator.open({
@@ -279,7 +289,12 @@
                                 $this.list[1].content.push(j) 
                         }
                     });
-                    $this.setting();
+                    if( $this.list[1].content.length == 0){
+                        $this.isShow = false;
+                    } else {
+                        $this.isShow = true;
+                        $this.setting();
+                    }
                     Indicator.close();
                 }
             });
@@ -331,6 +346,9 @@
                 //将展开的DOM归位 除掉样式类
                 container.className="";
                 this.expansion=null;
+                if(this.list[1].content.length == 0){
+                    this.isShow = false;
+                }
             },
             delAll : function(){
                 this.list = [];
@@ -338,7 +356,7 @@
             },
             delTheDateBase : function(delAll, newsId, one, j, index){
                 var $this=this;
-                
+                delAll == 0 ?  $this.del(one,j,index) : $this.delAll();
                 $.ajax({
                     xhrFields: {
                           withCredentials: true
@@ -352,7 +370,10 @@
                     dataType: "json",
                     success:function(data){
                         if (data.errno == 0) {
-                            delAll == 0 ?  $this.del(one,j,index) : $this.delAll();
+                            let instance = Toast({
+                                message : '删除成功',
+                                position : "bottom"
+                            });
                         }
                     }
                 });
