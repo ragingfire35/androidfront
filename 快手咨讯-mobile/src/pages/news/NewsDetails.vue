@@ -1,4 +1,5 @@
 <style lang="less" scoped>
+	
 	.baseBorderRadius(@radius) {
 	  border-radius: @radius;
 	  -webkit-border-radius: @radius;
@@ -40,7 +41,7 @@
     	font-size: .2rem;
     	color: #303030;
     	font-weight: bold;
-    	
+    	word-break: break-all;
     }
     .news-info{
 		font-size: .1rem;
@@ -54,11 +55,17 @@
     	display: block;
     	margin: .4rem 0;
     }
-    p.news-main{
+    div.news-main{
+    	width: 100%;
     	font-size: .14rem;
     	color: #414141;
     	letter-spacing: .01rem;
     	line-height: .28rem;
+    	word-break: break-all;
+    	text-align: justify;
+    	img{
+    		width: 100%;
+    	}
     }
     .author-tell{
 		font-size: .1rem;
@@ -77,6 +84,7 @@
     			width: .4rem;
     			height: .4rem;
     			.baseBorderRadius(.4rem);
+    			border: 1px solid #ccc;
     		}
     	}
     	.lt-text{
@@ -198,53 +206,6 @@
     		font-size: .12rem;
     	}
     }
-    .comment-inputBox{
-    	width: 100%;
-    	height: 1rem;
-	    background-image: -webkit-linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%);
-	    background-image: -o-linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%);
-	    background-image: linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%); 
-	   	padding-top: .6rem;
-	   	padding-bottom: .16rem;
-	   	overflow: hidden;
-	   	position: fixed;
-	   	bottom: 0;
-	   	left: 0;
-	   	padding: .65rem .15rem 0 .15rem;
-	    em{
-	    	float: left;
-	    	border: 1px solid #ccc;
-	    }
-	    em,img{
-	    	display: block;
-	    	width: .24rem;
-	    	height: .24rem;
-	    	.baseBorderRadius(.24rem);
-
-	   }
-	   textarea{
-			width: 2.58rem;
-			height: .24rem;
-			line-height: .24rem;
-			float: left;
-			border: 0;
-			resize: none;
-			padding-left: .15rem;
-			&:focus{
-				outline: 0;
-			}
-	   }
-	   button{
-	   		width: .48rem;
-	   		height: .14rem;
-	   		line-height: .16rem;
-			color: #c9c9c9;
-			border-left: 1px solid #c9c9c9;
-			background: transparent;
-			float: right;
-			margin-top: .05rem;
-	   }
-    }
     .more-comment{
     	width: 100%;
     	height: .24rem;
@@ -260,13 +221,154 @@
     		}
     	}
     }
+    .news-details-top{
+    	width: 100%;
+    	height: .5rem;
+    	background: #fff;
+    	position: fixed;
+    	z-index: 1;
+    	top: 0;
+    	left: 0;
+    }
+
+</style>
+<style lang="less">
+	@import '../../../static/css/plugIn/smohan.face.css';
+    .comment-inputBox{
+    	width: 100%;
+    	height: 1rem;
+ 	    background-image: -webkit-linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%);
+		background-image: -o-linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%);
+		background-image: linear-gradient(rgba(255,255,255,0.00) 0%, #FFFFFF 55%);
+		position: fixed;
+	   	left: 0;
+	   	z-index: 10000;
+	   	.comment-inputInner{
+	   		width: 100%;
+	   		height: .24rem;
+	   		position: absolute;	
+	   		left: 0;
+	   		right: 0;
+	   		margin: 0 auto;
+	   		bottom: .15rem;
+	   		left: .25rem;
+	   		&>em{
+				float: left;
+	   		}
+	   		&>em>img{
+				border: 1px solid #ccc;
+				display: block;
+	   		}
+	   		&>em,&>em>img{
+		    	width: .24rem;
+		    	height: .24rem;
+				border-radius: .24rem;
+				-webkit-border-radius: .24rem;
+				-o-border-radius: .24rem;
+				-moz-border-radius: .24rem;
+				-ms-border-radius: .24rem;
+	   		}
+	   	}
+    }
+    #Smohan_FaceBox{
+   	   float: left;
+   	   width: 3rem!important;
+	   #Smohan_text{
+			width: 2.2rem;
+			height: .24rem;
+			overflow-y: auto;
+			line-height: .24rem;
+			float: left;
+			border: 0;
+			resize: none;
+			padding-left: .15rem;
+			font-size: .14rem;
+			z-index: 10000;
+			&:empty:before{
+		        content: attr(placeholder);
+		        display: block;
+		        line-height: .24rem;
+		        color: #999;
+			}
+			&:focus{
+				outline: 0;
+			}
+	   }
+	   .faceBox{
+	   		width: .25rem;
+	   		height: .25rem;
+	   		float: left;
+	   		padding-top: 0;
+	   		.face{
+		   		width: .25rem;
+		   		height: .25rem;
+		   		margin-top: -.03rem;
+		   		cursor: pointer;
+	   		}
+	   }
+	   &>button{
+	   		width: .48rem;
+	   		height: .14rem;
+	   		line-height: .14rem;
+			color: #c9c9c9;
+			border-left: 1px solid #c9c9c9;
+			background: transparent;
+			float: right;
+			margin-top: .05rem;
+	   }
+    }
+    #SmohanFaceBox{
+    	width: 100%;
+    	top: -2.4rem;
+    	left: -.78rem;
+    	right: 0;
+    	margin: 0 auto;
+    	padding: .1rem;
+    	.Corner{
+    		-transform: rotate(180deg);
+    		-webkit-transform : rotate(180deg);
+    		bottom: -.62rem;
+		    right: .2rem;
+		    display: none!important;
+    	}
+    	.Content{
+		    width: 3.2rem;
+		    height: auto;
+		    margin: 0;
+		    overflow: hidden;
+
+		    h3{
+		    	width: auto;
+		    }
+    		li, li a{
+    			width: .26rem;
+    			height: .26rem;
+    			display: block;
+    		}
+    		li a img{
+    			width: .24rem;
+    			height: .24rem;
+    			display: block;
+    		}
+    	}
+    }	
+</style>
+<style lang="less">
+	.news-main{
+		img{
+			max-width: 100%;
+		}
+	}
 </style>
 <template>
 	<div class="news-details" v-if="newsDetails.title">
-		<go-back/>	
+		<div class="news-details-top">
+			<go-back/>
+		</div>
+
 		<p class="comment-fixed">
 			<go-back/>
-			<span>请大家关注文娱口和教育，合作微信：wxid_9415034150212战地小记者，带你看世界</span>
+			<span>{{authorInfo.introduce}}</span>
 		</p>
 		<p class="news-tt">
 			{{newsDetails.title}}
@@ -279,11 +381,9 @@
 			<span>{{newsDetails.source}}</span>
 		</p>
 		<em class="split-line"></em>
-		<p class="news-main">
-			{{newsDetails.content}}			
-		</p>
+		<div class="news-main" v-html="newsDetails.content"></div>
 		<p class="author-tell">
-			原创文章，作者：毕果。转载或内容合作联系zhuanzai@kuainewskr.com；违规转载法律必究。寻求报道请加微信：kuainews。
+			原创文章，作者：{{authorInfo.username}}。转载或内容合作联系zhuanzai@kuainewskr.com；违规转载法律必究。寻求报道请加微信：kuainews。
 		</p>
 		<div class="news-allComment">
 			<div class="author-home" :v-if="authorInfo.length">
@@ -310,7 +410,7 @@
 				<p class="user-comment-tt">
 					<span>精彩评论</span>
 					<span>&nbsp;/&nbsp;</span>
-					<span>2017</span>条评论
+					<span>{{commentCount}}&nbsp;</span>条评论
 				</p>
 				<ul 
 					class="user-comment-List"
@@ -338,17 +438,26 @@
 		</div>
 
 		<div class="comment-inputBox">
-			<em v-if="commentArr.length">
-				<img v-lazy="userHead || commentArr[0].head_pic" alt="">
-			</em>
-			<textarea placeholder="说出自己的看法..." id="Smohan_text"></textarea>
-			<button @click="sendComment($event)">发送</button>
+			<div class="comment-inputInner">
+				<em>
+					<img v-lazy="userHead" alt="">
+				</em>
+				<div id="Smohan_FaceBox">
+			       <div contenteditable="true" name="text" id="Smohan_text" placeholder="说出自己的看法..." @focus = "inputScrollFn"></div> 
+				   <p class="faceBox">
+					   <a href="javascript:void(0)" class="face" title="表情"></a>
+				   </p>
+				   <button @click="sendComment($event)">发送</button>
+				</div>
+			</div>			
 		</div>
 	</div>
 </template>
 <script>
 	import { Toast, InfiniteScroll, Indicator } from 'mint-ui';
 	import GoBack from '@/components/GoBack';
+	//表情插件
+	import "../../../static/js/plugIn/smohan.face.js"
 	export default{
 		data(){
 			return {
@@ -358,7 +467,8 @@
 				authorInfo : {},
 				commentArr : [],
 				userHead : window.localStorage.user_head,
-				moreCommentBtn : 1
+				moreCommentBtn : 1,
+				commentCount : ""
 			}
 		},
 		components:{
@@ -368,6 +478,7 @@
 			newsDetails(){
 				var $this = this;
 				$(function(){
+					$(window).scrollTop(0);
 					$this.GLOBAL.agoTime.render(document.querySelectorAll('.news-time'), 'zh_CN');
 				})
 			},
@@ -401,24 +512,28 @@
 		     			$this.newsDetails = data.data;
 		     			$this.author_detail();
 		     			$this.getOriginComment($this.moreCommentBtn);
+			     		Indicator.close();
+						$(function(){				
+							$("a.face").smohanfacebox({
+								Event : "click",	//触发事件	
+								divid : "Smohan_FaceBox", //外层DIV ID
+								textid : "Smohan_text" //文本框 ID
+							});
+							var top =  $(window).height() - $(".comment-inputBox").height();
+							$(".comment-inputBox").css("top", top);
+						});
 		     		} else {
 		     			//$(".more-comment").hide();
 		     		}
 		     	}
 		    });
-
 		    $(window).on({
 		    	"resize": function(){
-					if( $(window).height() < h ){
-					 	$(".user-comment-main").hide();
-					 	$(".comment-inputBox").css("padding", ".16rem 0 .16rem 0");
-					} else {
-					   	$(".user-comment-main").show();	
-					   	$(".comment-inputBox").css("padding", ".65rem .15rem 0 .15rem");
-					}
-		    	},
+					var top =  $(window).height() - $(".comment-inputBox").height();
+					$(".comment-inputBox").css("top", top);
+			    },
 		    	"scroll" : function(){
-					if( $(window).scrollTop() > $(".news-tt").offset().top){
+					if($(".comment-fixed").length != 0 && $(window).scrollTop() > $(".news-tt").offset().top){
 						$(".comment-fixed").show();	
 					} else {
 						$(".comment-fixed").hide();
@@ -428,19 +543,24 @@
 		    });
 		},
 		methods:{
+			inputScrollFn(){
+				var top =  $(window).height() - $(".comment-inputBox").height();
+				$(".comment-inputBox").css("top", top);
+			},
+
 			loadMore() {
 			  var $this = this;
 			  this.loading = true;
 			  setTimeout(() => {
 			  	$(".more-comment button").trigger('click');
 			    $this.loading = false;
-			  }, 2500);
+			  }, 300);
 			},
 			sendComment :function(e){
 			 	var textArea = $("#Smohan_text");
 			    var $this = this;
 			    $(e.target).prop("disabled", true);
-				if(window.localStorage.IsLoginIn == 'false'){
+				if(window.localStorage.IsLoginIn !== 'true'){
 					let instance = Toast({
 						message : '请先登录',
 						position : "bottom"
@@ -455,9 +575,9 @@
 				var commentVal = {
 					head_pic : window.localStorage.user_head,
 					nickname : window.localStorage.user_nickName,
-					content :  $("#Smohan_text").val()
+					content :  $("#Smohan_text").html()
 				};
-				if(textArea.val() != ""){
+				if(textArea.html() != ""){
 
 				     $.ajax({
 			 		 	xhrFields: {
@@ -472,10 +592,9 @@
 				     	dataType: "json",
 				     	success:function(data){
 				     		$(e.target).prop("disabled", false);
-				     		$this.commentArr.unshift(commentVal);
-				     		$("#Smohan_text").val("");
-
 				     		if(data.errno == "0"){
+					     		$this.commentArr.unshift(commentVal);
+					     		$("#Smohan_text").html("");
 								let instance = Toast({
 									message : '发送成功',
 									position : "bottom"
@@ -498,7 +617,7 @@
 					setTimeout(() => {
 					  instance.close();
 					  $(e.target).prop("disabled", false);
-					}, 2000);
+					}, 800);
 
 				}
 			},
@@ -522,7 +641,7 @@
 			     	dataType: "json",
 			     	success:function(data){
 			     		if(data.errno == "0"){
-			     			Indicator.close();
+			     			$this.commentCount = data.data.count;
 			     			if($this.commentArr.length != data.data.count){
 			     				$this.commentArr = $this.commentArr.concat(data.data.result);
 				     			if(page !== 1){
@@ -533,8 +652,6 @@
 			     			} else {
 			     				$(".more-comment button").html("已无更多评论。");
 			     			}
-
-
 
 			     		} else {
 			     			alert(data.errmsg);

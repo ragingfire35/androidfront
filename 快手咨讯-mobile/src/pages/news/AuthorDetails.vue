@@ -45,6 +45,7 @@
 	}
 	.author-publicNews{
 		padding: 0 .15rem;
+		margin-bottom: 1rem;
 		text-align: left;
 	}
 	.publicNews-num{
@@ -73,10 +74,21 @@
 		color: #A0A0A0;
 	}
 </style>
+<style lang="less">
+	.banner .jqthumb,
+	.banner .jqthumb > div
+	{
+		webkit-border-radius: 0;
+	    -moz-border-radius: 0;
+	    -ms-border-radius: 0;
+	    -o-border-radius: 0;
+	    border-radius: 0;
+	}
+</style>
 <template>
 	<div class="author-details" v-if="authorInfo.username">
 		<div class="banner">
-			<img v-lazy="basePath + authorInfo.head_pic" alt="">
+			<img :src="basePath + authorInfo.head_pic" alt="">
 			<div class="author-info">
 				<p class="author-name">
 					<span>{{authorInfo.username}}</span>
@@ -146,6 +158,11 @@
 		     		
 						$(function(){
 							$this.GLOBAL.agoTime.render(document.querySelectorAll('.a_public_time'), 'zh_CN');
+							$(".banner img").jqthumb({
+								"width" : $(".banner img").width(),
+								"height" : $(".banner img").height()
+							})
+							$(window).scrollTop(0);
 						})
 		     		} else {
 		     		}

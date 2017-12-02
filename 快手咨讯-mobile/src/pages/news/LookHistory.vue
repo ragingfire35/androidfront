@@ -142,8 +142,7 @@
     .LookHistory{
         width: 100%;
         padding: 0 .15rem;
-        overflow: hidden;
-       
+        overflow: hidden;       
     }
     .Look-history-top{
         height: .5rem;
@@ -151,18 +150,21 @@
         line-height: .5rem;
         font-size: .15rem;
         color: #303030; 
+        background: #fff;
         position: fixed;
         top: 0;
         left: 0;      
         &>p{
             width: .68rem;
             margin: 0 auto;
+            background: #fff;
         }
         &>button{
             height: .5rem;
             line-height: .5rem;
             display: block;
             color: #FF8000;
+            background: #fff;
             background: transparent;
             font-size: .14rem;
             position: absolute;
@@ -174,6 +176,12 @@
     .swipeleft{
         transform:translateX(-.82rem);
         -webkit-transform:translateX(-.82rem);
+        -webkit-transition:all 0.3s;
+        transition:all 0.3s;
+    }
+    .swipeRight{
+        transform:translateX(.01rem);
+        -webkit-transform:translateX(.01rem);
         -webkit-transition:all 0.3s;
         transition:all 0.3s;
     }
@@ -213,9 +221,9 @@
                                 <img v-lazy="basePath + one.cover_img" alt="">
                             </div>
                         </router-link>
-                         <i @click="delTheDateBase(0, one.news_id, one, j, index)">
+                        <i @click="delTheDateBase(0, one.news_id, one, j, index)">
                              <img src="../../../static/images/del.png" alt="">
-                         </i>
+                        </i> 
                     </li>   
                 </ul>
             </div> 
@@ -253,7 +261,10 @@
                             content :[]
                         }
 	            ],
-	            expansion : null 	//是否存在展开的list
+	            expansion : null,	//是否存在展开的list
+                sliderConf:{//滑动配置  
+                    distance:.82  
+                },
         	}
                                                
         },
@@ -316,19 +327,18 @@
                             x = event.changedTouches[0].pageX;
                         });
                         container[i].addEventListener('touchmove', function(event){
-                            event.preventDefault()
                             X = event.changedTouches[0].pageX;                          
                                 //记录当前触控点横坐标
                             if($this.expansion){                                       
                                 //判断是否展开，如果展开则收起
-                                $this.expansion.className = "";
-                            }     
-                            if(X - x > 30){                                             
+                                $this.expansion.className = "swipeRight";
+                            }
+                            if(X - x > 10){                                         
                                 //右滑
-                                this.className = "";                                    
+                                this.className = "swipeRight";                                  
                                 //右滑收起
                             }
-                            if(x - X > 30){                                             
+                            else if(x - X > 10){                                             
                                 //左滑
                                 this.className = "swipeleft";                           
                                 //左滑展开
@@ -336,7 +346,7 @@
                             }
                         });
                     }
-                });   
+                });  
             },
 
             del:function(one,j,index){
@@ -344,7 +354,7 @@
                  //删除List这条数据 DOM随之更新渲染
                 var container = document.querySelector('.swipeleft');           
                 //将展开的DOM归位 除掉样式类
-                container.className="";
+                container.className="swipeRight";
                 this.expansion=null;
                 if(this.list[1].content.length == 0){
                     this.isShow = false;

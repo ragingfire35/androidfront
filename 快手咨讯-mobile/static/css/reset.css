@@ -22,6 +22,9 @@ opacity: .6;
 body,input,button,a,textarea{
 	font-family: "PingFangSC-Medium", "微软雅黑",Arial;
 }
+body{
+	overflow-x: hidden;
+}
 li{
 	list-style: none;
 }

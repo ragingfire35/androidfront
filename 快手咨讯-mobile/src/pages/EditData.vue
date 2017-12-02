@@ -188,26 +188,37 @@
 			    });
 			},
 			uploadHeadImg : function(e){
-		        var fil = $(e.target)[0].files;
+		          var fil = $(e.target)[0].files;
 			      for (var i = 0; i < fil.length; i++) {
 			        reads(fil[i]);
 			      }
 				  function reads(fil) {
 				    var reader = new FileReader();
 				    reader.readAsDataURL(fil);
-				    reader.onload = function() {
-				        $('.user-head img')
-				        .prop("src", reader.result)
-				        .jqthumb({
-							width: $(".user-head img").css("width"),
-							height: $(".user-head img").css("height")
-						});;
-				    };
+				    if (!/image\/\w+/.test(fil.type)) {
+				      alert('上传的不是图片');
+				      return false;
+				    }
+				    if(fil.size > 2 * 1024 * 1024){
+				    	alert("上传的头像不能超过2M");
+				    } 
+				    else {
+					    reader.onload = function() {
+					        $('.user-head img')
+					        .prop("src", reader.result)
+							.jqthumb({
+								width: $(".user-head img").css("width"),
+								height: $(".user-head img").css("height"),
+								after: function(){
 
+								}
+							})
+					    };
+				    }
 				  }
 			}
 		},
-		components:{
+		components:{			
 			GoBack
 		}
 	}

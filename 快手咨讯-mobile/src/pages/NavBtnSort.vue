@@ -168,6 +168,7 @@
 		     		} else if(data.errno == 1){
 		     			alert(data.errmsg);
 		     		} else if(data.errno == 2){
+		     			alert(2)
 						let instance = Toast({
 							message : data.errmsg,
 							position : "bottom"
@@ -201,7 +202,8 @@
 			     	success:function(data){
 			     		if(data.errno == 0){
 			     			$this.$router.push({"path" : "/"});
-			     		} else if(data.errno == 1){
+			     			window.sessionStorage.recordIndex = 0;
+			     		} else if(data.errno == 2){
 			     			alert(data.errmsg);
 			     			$this.$router.push({"path" : "/loginIn"});
 			     		}

@@ -16,9 +16,9 @@
 	    background-color:#fff;
 	}
 	.Home{
-		margin-bottom: 1rem;
+		margin-bottom: 1rem; 
 	}
-
+	
 	.nav-bar{
 		width: 100%;
 		background: #fff;
@@ -32,6 +32,7 @@
 		height: .5rem;
 		width: 3.2rem;
 		overflow-x: auto;
+		overflow-y: hidden;
 		padding-left: .15rem;
 		white-space: nowrap;
 		font-size: 0;
@@ -73,6 +74,7 @@
 	}
 	.home-main{
 		margin-top: .5rem;
+		margin-bottom: 1rem;
 	}
 	.carousel-img{
 		width: 3.3rem;
@@ -161,14 +163,16 @@
 	}
 	.mint-loadmore-top{
 	    height: 100px;
-	    line-height: 80px;
+	    line-height: 140px;
 	    margin-top: -100px;
 	}
 	.mint-loadmore-top span
 	{
 		font-size: .14rem;
-		color: #FF8000;	
-		
+		color: #FF8000;		
+	}
+	.mint-tab-container-wrap{
+		min-height: 1rem;
 	}
 </style>
 
@@ -215,27 +219,28 @@
 				</div>
 		    </wc-slide>
 		</wc-swiper>
-		<mt-loadmore 
-			:top-method="loadTop" 
-			@top-status-change="handleTopChange" 
-			ref="loadmore"
-			:maxDistance="100"
-		>
-			<mt-tab-container v-model="ACTIVE" swipeable id="tab-container" v-if="cateNews.length">
 
-				<mt-tab-container-item 
-					class="wrapper"
-					v-for="nav, navIndex in category"
-					:id = "navIndex"
-					:key = 'navIndex'
-		 			v-infinite-scroll="loadMore"
-		  			:infinite-scroll-disabled="loading"
-		  			infinite-scroll-distance="10"
-		  			infinite-scroll-immediate-check="false"
-					
-					
-				><!-- v-if= "navIndex == ACTIVE" -->
-					<mt-cell>
+		<mt-tab-container v-model="ACTIVE" swipeable id="tab-container" v-if="cateNews.length">
+
+			<mt-tab-container-item 
+				class="wrapper"
+				v-for="nav, navIndex in category"
+				:id = "navIndex"
+				:key = 'navIndex'
+	 			v-infinite-scroll="loadMore"
+	  			:infinite-scroll-disabled="loading"
+	  			infinite-scroll-distance="10"
+	  			infinite-scroll-immediate-check="false"
+				
+				
+			><!-- v-if= "navIndex == ACTIVE" -->
+				<mt-cell>
+					<mt-loadmore 
+						:top-method="loadTop" 
+						@top-status-change="handleTopChange" 
+						ref="loadmore"
+						:maxDistance="100"
+					>
 						<ul class="newsList"> 
 							<li class="newsList_li" 
 								v-for="item, index in cateNews[navIndex]"
@@ -271,11 +276,12 @@
 							<p v-else-if="moreNewsBtn === ''">
 								<span>已无更多新闻</span>
 							</p>
-						</a>						
-					</mt-cell>
-				</mt-tab-container-item>
-			</mt-tab-container>
-		</mt-loadmore>	
+						</a>	
+					</mt-loadmore>						
+				</mt-cell>
+			</mt-tab-container-item>
+		</mt-tab-container>
+
 	</div>
   </div>
 </template>
@@ -313,7 +319,14 @@
 					this.cateNews.push(new Array());
 					this.newspageNumber.push(1);					
 				}
-				
+				$(function(){
+					var index = window.sessionStorage.recordIndex;
+					if( index ){
+						setTimeout(function(){
+							$(".nav-btnBox li:eq("+index+")").trigger('click');
+						}, 200)			
+					}
+				})
 			},
 			cateNews : function(){
 				var $this = this;
@@ -334,12 +347,9 @@
 			  spinnerType: 'fading-circle'
 			});
 			var $this = this;
+			
+			
 
-   			 /*$(document).on("click", "[newsid]", function(e){
-				$(document).off("click", "[newsid]");
-				 var newsid = $(this).attr("newsid");
-				 $this.$router.push({'path' : "NewsDetails", 'query': {'newsid': newsid}});
-			});*/
 
 		    $.ajax({
      		 	xhrFields: {
@@ -359,6 +369,10 @@
 		methods:{
 			loadMore() {
 			  var $this = this;
+			  // 防止多次加载
+			  if ($this.loading) {
+			    return false;
+			  }
 			  $this.loading = true;
 			  setTimeout(() => {
 					$(".load-more-newsBtn").trigger('click');   
@@ -369,10 +383,8 @@
 			loadTop(){
 				var selector = $(".nav-btnBox li:eq("+this.ACTIVE+")");
 				var index = selector.index();
-				var showId = selector.attr("showId");
-				window.sessionStorage.recordIndex = index;
+				var showId = selector.attr("showId");				
 				this.getNowNews(showId, index, 1, 1);
-
 			},
 
 			handleTopChange(status) {
@@ -387,12 +399,7 @@
 				});	
 			},
 			categoryFn : function(data){
-				this.category = data;
-				$(function(){
-					var index = window.sessionStorage.recordIndex;
-					$(".nav-btnBox li:eq("+parseInt(index)+")").trigger("click");
-				})
-				
+				this.category = data;				
 			},
 			newsFn : function(data){
 				this.cateNews.push(data);
@@ -402,6 +409,7 @@
 				var $this = this;		
 				$this.ACTIVE = index;		
 				$this.active = "'"+ index +"'";		
+				window.sessionStorage.recordIndex = index;
 			},
 			getNowNews : function(showId, index, flag, page){
 				var $this = this;
@@ -428,7 +436,7 @@
 			     		if(data.data.length != 0){
 			     			if(flag == 1){
 			     				$this.cateNews[index] = [];
-								$this.$refs.loadmore.onTopLoaded();
+								$this.$refs.loadmore[parseInt(index)].onTopLoaded();
 								let instance = Toast({
 									message : "刷新成功",
 									position : "bottom"
@@ -453,17 +461,22 @@
 				$this.ACTIVE = index;	*/		
 			},
 			btmLine : function(e){
-		        var boxL = $(".nav-btnBox").scrollLeft();
-		        var bgL = $(e.target).offset().left;
-		        var thisCenter = $(e.target).width() / 2 - $('.bottom-line').width() / 2;
-		        var newL = bgL + boxL;
-		        $('.bottom-line').animate({left:newL+thisCenter},200);
-		        $(e.target).addClass('active').siblings('button').removeClass("active");
-		        if($(e.target).index() >= 5){	
-		        	$(".nav-btnBox").scrollLeft(10000);
-		        } else {
-		        	$(".nav-btnBox").scrollLeft(0);
-		        }
+				$(function(){
+			        var boxL = $(".nav-btnBox").scrollLeft();
+			        var bgL = $(e.target).offset().left;
+			        var newL = bgL + boxL;
+			        var bestL = newL - $(e.target).width() / 2;
+			        $('.bottom-line').css({
+			        	"transform": "translateX("+ bestL +"px)",
+			        	"transition" : "transform 200ms"
+			        })
+			        $(e.target).addClass('active').siblings('button').removeClass("active");
+			        if($(e.target).index() >= 5){	
+			        	$(".nav-btnBox").scrollLeft(10000);
+			        } else {
+			        	$(".nav-btnBox").scrollLeft(0);
+			        }
+				})
 			}
 		},
 

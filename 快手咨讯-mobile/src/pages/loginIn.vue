@@ -241,7 +241,7 @@
 				data.data.sign == "" ? 
 				window.localStorage.user_sign = "暂无个人简介" : 
 				window.localStorage.user_sign = data.data.sign;
-				window.history.go(-1);
+				window.history.back();//ios 不支持go(-1)
 			},
 		},
 

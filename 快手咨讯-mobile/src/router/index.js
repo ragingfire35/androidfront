@@ -15,7 +15,6 @@ import AuthorDetails from '@/pages/news/AuthorDetails'
 import NewsDetails from '@/pages/news/NewsDetails'
 import LookHistory from '@/pages/news/LookHistory'
 import Personal from '@/pages/Personal'
-
 Router.prototype.goBack = function () {
   this.isBack = true
   window.history.go(-1)
@@ -39,7 +38,7 @@ export default new Router({
               footerShow : true
             }
             
-          },                
+          },           
           {
             path: '/Search',
             name: 'Search',

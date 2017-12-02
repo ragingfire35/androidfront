@@ -25,12 +25,6 @@ Vue.use(VueDND)
 import "../static/css/reset.css";
 import "../static/js/plugIn/rem.js";
 
-/*//表情插件
-import "../static/js/plugIn/smohan.face.js"
-import '../static/css/plugIn/smohan.face.css';*/
-
-
-
 //filter
     //格式化时间
     import {formatDate} from '../static/js/plugIn/date.js';
@@ -49,6 +43,14 @@ import '../static/css/plugIn/smohan.face.css';*/
         }
     });
 
+// 图片懒加载
+import { Lazyload } from 'mint-ui';
+Vue.use(Lazyload, {
+  error: './static/images/loading.jpg',//这个是请求失败后显示的图片
+  loading: './static/images/loading.jpg',//这个是加载的loading过渡效果
+  attempt: 3,//尝试加载几次
+  listenEvents: [ 'scroll', 'mousewheel' ]
+})
 
 //directive
     // 处理图片

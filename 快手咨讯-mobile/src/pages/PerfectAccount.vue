@@ -128,8 +128,7 @@
 	export default{
 		data(){
 			return{
-		    	isLoginIn: this.GLOBAL.IsLoginIn,
-		    	vLength : false,
+		    	vLength : false
 			}
 		},
 		mounted(){
@@ -176,7 +175,7 @@
 			     		if(data.errno == 0){
 			     			$this.saveLoginInfo(data);
 			     		} else {
-			     			alert(data.errmsg);
+			     			alert(data.errno + data.errmsg);
 			     		}
 			     	}
 			    })
