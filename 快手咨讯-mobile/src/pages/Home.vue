@@ -176,8 +176,6 @@
 	}
 </style>
 
-
-
 <template>	
   <div class="Home" id='container'>
   	<div class="nav-bar">
