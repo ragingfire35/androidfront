@@ -82,7 +82,7 @@
 
 
 
-<template>	
+<template>
   <div class="loginIn">
   	<p class="loginIn-h4">我们不制造新闻，<br/>我们只是&ensp;<span>新闻的搬运工</span>。</p>
 	<div class="loginIn-main">
@@ -114,15 +114,14 @@
 			}
 		},
 		components:{
-		},	
+		},
 		mounted(){
 			var h = $(window).height();
 			$(window).resize(function(){
 				 $(window).height() < h ?
 				 $("footer").hide() :
-				 $("footer").show();	
+				 $("footer").show();
 			})
-			
 		},
 		methods: {
 			isPhone: function(phoneNumber){
@@ -165,7 +164,7 @@
 		                      withCredentials: true
 		                },//跨域 后端存储session时，cookie不能用，发送此凭据
 				     	url: $this.GLOBAL.URL + "index.php/login/sendSMS",
-				     	type:"post", 
+				     	type:"post",
 				     	dataType: "json",
 				     	data:{
 				     		"phone" : phoneVal
@@ -194,7 +193,7 @@
 		                },//跨域 后端存储session时，cookie不能用，发送此凭据
 						crossDomain: true,
 				     	url: $this.GLOBAL.URL + "index.php/login/Login",
-				     	type:"post", 
+				     	type:"post",
 				     	dataType:"json",
 				     	data:{
 				     		"phone" : phoneVal,
@@ -202,13 +201,13 @@
 				     	},
 				     	success:function(data){
 				     		$(e.target).prop("disabled", false).html("登录").css("background","#FF8000");
-				     		if(data.errno == 0){				     			
+				     		if(data.errno == 0){
 								if(data.data.first_time == 1){
 									$this.$router.push({'path': '/PerfectAccount'})
-								} else{							
-									$this.saveLoginInfo(data);	
+								} else{
+									$this.saveLoginInfo(data);
 								}
-								
+
 				     		} else {
 								let instance = Toast({
 									message : data.errmsg,
@@ -238,8 +237,8 @@
 				window.localStorage.IsLoginIn = 'true';
 				window.localStorage.user_head = data.data.head_pic;
 				window.localStorage.user_nickName = data.data.nickname;
-				data.data.sign == "" ? 
-				window.localStorage.user_sign = "暂无个人简介" : 
+				data.data.sign == "" ?
+				window.localStorage.user_sign = "暂无个人简介" :
 				window.localStorage.user_sign = data.data.sign;
 				window.history.back();//ios 不支持go(-1)
 			},

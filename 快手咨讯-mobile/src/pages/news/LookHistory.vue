@@ -55,7 +55,7 @@
         width: 100%;
         li{
             width: 4.12rem;
-            height: .82rem;  
+            height: .82rem;
             overflow: hidden;
             margin-bottom: .2rem;
             a{
@@ -84,7 +84,6 @@
                     right: 0;
                     margin: auto;
                 }
-               
 
             }
         }
@@ -129,7 +128,6 @@
             margin-bottom: .14rem;
 
         }
-        
     }
     .his-bt{
         font-size: .15rem;
@@ -142,18 +140,18 @@
     .LookHistory{
         width: 100%;
         padding: 0 .15rem;
-        overflow: hidden;       
+        overflow: hidden;
     }
     .Look-history-top{
         height: .5rem;
         width: 100%;
         line-height: .5rem;
         font-size: .15rem;
-        color: #303030; 
+        color: #303030;
         background: #fff;
         position: fixed;
         top: 0;
-        left: 0;      
+        left: 0;
         &>p{
             width: .68rem;
             margin: 0 auto;
@@ -223,15 +221,15 @@
                         </router-link>
                         <i @click="delTheDateBase(0, one.news_id, one, j, index)">
                              <img src="../../../static/images/del.png" alt="">
-                        </i> 
-                    </li>   
+                        </i>
+                    </li>
                 </ul>
-            </div> 
+            </div>
         </div>
 
         <div v-else-if="isShow === false" class="noStyle" >
             <span>很干净哦~</span>
-        </div> 
+        </div>
 
         <div class="clearAll-box">
         	<div class="clearAll-dialog">
@@ -262,11 +260,10 @@
                         }
 	            ],
 	            expansion : null,	//是否存在展开的list
-                sliderConf:{//滑动配置  
-                    distance:.82  
+                sliderConf:{//滑动配置
+                    distance:.82
                 },
         	}
-                                               
         },
         components:{
             GoBack

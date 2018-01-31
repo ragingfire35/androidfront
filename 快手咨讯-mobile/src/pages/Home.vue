@@ -16,9 +16,8 @@
 	    background-color:#fff;
 	}
 	.Home{
-		margin-bottom: 1rem; 
+		margin-bottom: 1rem;
 	}
-	
 	.nav-bar{
 		width: 100%;
 		background: #fff;
@@ -51,6 +50,7 @@
 			}
 			&.active{
 				color: #FF8000;
+				font-weight: bold;
 			}
 		}
 	}
@@ -67,6 +67,7 @@
 	.bottom-line{
 		width: .1rem;
 		height: .02rem;
+		border-radius: .02rem;
 		background: #FF8000;
 		position: absolute;
 		left: .24rem;
@@ -81,6 +82,16 @@
 		height: 1.8rem;
 		display: block;
 		margin: 0 auto;
+	}
+	.carousel-mask{
+		width: 3.3rem;
+		height: 100%;
+		position: absolute;
+		background: rgba(0,0,0,.2);
+		left: 0;
+		right: 0;
+		margin: 0 auto;
+		top: 0;
 	}
 	.carousel-text{
 		font-size: .14rem;
@@ -112,7 +123,9 @@
 	.newsLt{
 		float: left;
 		width: 2.2rem;
+		height: .62rem;
 		text-align: justify;
+		position: relative;
 		.news-tt{
 			width: 100%;
 			text-align: left;
@@ -120,13 +133,22 @@
 			font-weight: bold;
 			color: #303030;
 			line-height: .22rem;
-			word-break: break-all;
+		   	display: -webkit-box;
+		    display: -moz-box;
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    word-break: break-all;
+		    -webkit-box-orient: vertical;
+		    -webkit-line-clamp:2;
 		}
 		.news-author-info{
 			color: #a8a8a8;
 			font-size: .12rem;
+			height: .12rem;
 			text-align: left;
-			margin-top: .08rem;
+			position: absolute;
+			bottom: 0;
+			left: 0;
 		}
 	}
 	.newsRt{
@@ -147,6 +169,13 @@
 	}
 </style>
 <style>
+	.wc-swiper-container{
+		transform: scaleX(.9);
+		overflow: visible;
+	}
+	.wc-slide{
+		padding: 0 .03rem;
+	}
 	.mint-cell{
 		background: #fff!important;
 	}
@@ -157,7 +186,7 @@
 	.mint-cell-wrapper{
 		padding: .15rem!important;
 		background: #fff!important;
-	}	
+	}
 	.mint-spinner-triple-bounce{
 		display: inline-block;
 	}
@@ -169,50 +198,51 @@
 	.mint-loadmore-top span
 	{
 		font-size: .14rem;
-		color: #FF8000;		
+		color: #FF8000;
 	}
 	.mint-tab-container-wrap{
 		min-height: 1rem;
 	}
 </style>
 
-<template>	
+<template>
   <div class="Home" id='container'>
   	<div class="nav-bar">
   		<ul class="nav-btnBox">
-  			<li 
-  				v-for="item, index in category" 
+  			<li
+  				v-for="item, index in category"
   				:class="{active:ACTIVE == index}"
-  				@click="btmLine($event), getNewsShow(item.id, index), active = active" 
+  				@click="btmLine($event), getNewsShow(item.id, index), active = active"
   				@click.once="getNowNews(item.id, index, 0)"
   				:showId = item.id
   			>{{item.category}}</li>
-
 	  		<div class="bottom-line" v-if="category.length"></div>
   		</ul>
 		<router-link to="/NavBtnSort" tag="button" class="nav-slideDown-btn"  v-if="category.length"></router-link>
   	</div>
-	
+
 	<div class="home-main">
-		
+
 		<!-- // 在需要使用的 view 里面引入: lunbo-->
-		<wc-swiper  
-			:autoplay='true' 
-			ref="swiper" 
-			:pagination="false" 
-			@transitionend="fn" 
+		<wc-swiper
+			:autoplay='true'
+			ref="swiper"
+			:pagination="false"
+			@transitionend="fn"
 			v-if="banner.length"
 		>
-		    <wc-slide 
-		    	v-for="item, index in banner" 
-		    	:newsId = "item.news_id" 
+		    <wc-slide
+		    	v-for="item, index in banner"
+		    	:newsId = "item.news_id"
 		    	key="index"
 		    >
 		    	<!-- // 这里放你需要轮播的内容, 比如一张图片 -->
-				<div style="position:relative;">	
+				<div style="position:relative;">
 					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
 						<img v-lazy="basePath + item.cover_img" alt="" class="carousel-img">
-						<p class="carousel-text">{{item.title | subStrText(20)}}</p>
+						<div class="carousel-mask">
+							<p class="carousel-text">{{item.title | subStrText(20)}}</p>
+						</div>
 					</router-link>
 				</div>
 		    </wc-slide>
@@ -220,7 +250,7 @@
 
 		<mt-tab-container v-model="ACTIVE" swipeable id="tab-container" v-if="cateNews.length">
 
-			<mt-tab-container-item 
+			<mt-tab-container-item
 				class="wrapper"
 				v-for="nav, navIndex in category"
 				:id = "navIndex"
@@ -229,24 +259,23 @@
 	  			:infinite-scroll-disabled="loading"
 	  			infinite-scroll-distance="10"
 	  			infinite-scroll-immediate-check="false"
-				
-				
+
 			><!-- v-if= "navIndex == ACTIVE" -->
 				<mt-cell>
-					<mt-loadmore 
-						:top-method="loadTop" 
-						@top-status-change="handleTopChange" 
+					<mt-loadmore
+						:top-method="loadTop"
+						@top-status-change="handleTopChange"
 						ref="loadmore"
 						:maxDistance="100"
 					>
-						<ul class="newsList"> 
-							<li class="newsList_li" 
+						<ul class="newsList">
+							<li class="newsList_li"
 								v-for="item, index in cateNews[navIndex]"
 
 							>
 								<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
 									<div class="newsLt">
-										<p class="news-tt">{{item.title | subStrText(28)}}</p>
+										<p class="news-tt">{{item.title}}</p>
 										<p class="news-author-info">
 											<span class="author-name">{{item.admin_id}}</span>
 											<span>&ensp;·&ensp;</span>
@@ -269,13 +298,13 @@
 							<p style="font-size:.16rem;" v-else-if="moreNewsBtn === false">
 								<span>加载中</span>
 								<mt-spinner type="triple-bounce" color="#FF8000"></mt-spinner>
-								
+
 							</p>
 							<p v-else-if="moreNewsBtn === ''">
 								<span>已无更多新闻</span>
 							</p>
-						</a>	
-					</mt-loadmore>						
+						</a>
+					</mt-loadmore>
 				</mt-cell>
 			</mt-tab-container-item>
 		</mt-tab-container>
@@ -286,17 +315,17 @@
 
 
 <script>
-	
+
 	import { Indicator, Loadmore, Toast } from 'mint-ui';
 	export default{
-		
+
 		data(){
-			return{				
+			return{
 				active : '0',//预先指定显示的块，值必须字符串 //侧滑选项卡
 				ACTIVE : 0,
 				basePath : this.GLOBAL.__PUBLIC__ ,
 				banner : [],
-				category : [],
+				category : ["aa"],
 				cateNews: [],
 				newspageNumber : [],
 				moreNewsBtn : false,
@@ -315,14 +344,14 @@
 			category : function(val){
 				for (var i = 0; i < val.length; i++) {
 					this.cateNews.push(new Array());
-					this.newspageNumber.push(1);					
+					this.newspageNumber.push(1);
 				}
 				$(function(){
 					var index = window.sessionStorage.recordIndex;
 					if( index ){
 						setTimeout(function(){
 							$(".nav-btnBox li:eq("+index+")").trigger('click');
-						}, 200)			
+						}, 200)
 					}
 				})
 			},
@@ -330,7 +359,7 @@
 				var $this = this;
 				$(function(){
 					$this.GLOBAL.agoTime.render(document.querySelectorAll('.public-time'), 'zh_CN');
-				}) 
+				})
 			},
 			topStatus(status) {
 				this.topStatus = status;
@@ -345,16 +374,12 @@
 			  spinnerType: 'fading-circle'
 			});
 			var $this = this;
-			
-			
-
-
 		    $.ajax({
      		 	xhrFields: {
                       withCredentials: true
                 },//跨域 后端存储session时，cookie不能用，发送此凭据
 		     	url: $this.GLOBAL.URL + "index.php/News/index",
-		     	type:"post", 
+		     	type:"post",
 		     	dataType: "json",
 		     	success:function(data){
 		     		$this.bannerFn(data.data.banner);
@@ -373,15 +398,15 @@
 			  }
 			  $this.loading = true;
 			  setTimeout(() => {
-					$(".load-more-newsBtn").trigger('click');   
-					$this.loading = false; 	
+					$(".load-more-newsBtn").trigger('click');
+					$this.loading = false;
 			  }, 1000)
-			  	
+
 			},
 			loadTop(){
 				var selector = $(".nav-btnBox li:eq("+this.ACTIVE+")");
 				var index = selector.index();
-				var showId = selector.attr("showId");				
+				var showId = selector.attr("showId");
 				this.getNowNews(showId, index, 1, 1);
 			},
 
@@ -391,22 +416,22 @@
 			bannerFn : function(data){
 				var $this = this;
 				$.each(data, function(i, j){
-					if( j.grade == "1" ){						
+					if( j.grade == "1" ){
 						$this.banner.push( j )
 					}
-				});	
+				});
 			},
 			categoryFn : function(data){
-				this.category = data;				
+				this.category = data;
 			},
 			newsFn : function(data){
 				this.cateNews.push(data);
 				this.moreNewsBtn = true;
 			},
 			getNewsShow : function(showId, index){
-				var $this = this;		
-				$this.ACTIVE = index;		
-				$this.active = "'"+ index +"'";		
+				var $this = this;
+				$this.ACTIVE = index;
+				$this.active = "'"+ index +"'";
 				window.sessionStorage.recordIndex = index;
 			},
 			getNowNews : function(showId, index, flag, page){
@@ -415,7 +440,7 @@
 				if(index == 0 && flag == 0) {
 					return;
 					//禁止已经预加载的新闻 ，对应的按钮可以点击
-				};	
+				};
 				$this.moreNewsBtn = false;
 				$this.getNewsShow(showId, index);
 			    $.ajax({
@@ -423,12 +448,12 @@
 	                      withCredentials: true
 	                },//跨域 后端存储session时，cookie不能用，发送此凭据
 			     	url: $this.GLOBAL.URL + "index.php/News/cate_news",
-			     	type:"post", 
+			     	type:"post",
 			     	dataType: "json",
 			     	data:{
 			     		category_id	: showId,
 			     		page : page || $this.newspageNumber[$this.ACTIVE],
-			     		showNum : showNum		
+			     		showNum : showNum
 			     	},
 			     	success:function(data){
 			     		if(data.data.length != 0){
@@ -442,21 +467,21 @@
 			     			}
 				     		$.each(data.data, function(i ,j){
 				     			$this.cateNews[index].push(j);
-				     		});	
+				     		});
 				     		showNum > data.data.length ?
 				     			$this.moreNewsBtn = "" :
-				     			$this.moreNewsBtn = true;	
+				     			$this.moreNewsBtn = true;
 			     		} else {
-			     			$this.moreNewsBtn = '';	
+			     			$this.moreNewsBtn = '';
 			     		}
 
 			     	}
-			    });		
+			    });
 
 			},
 			fn : function(){
-/*				var $this = this;		
-				$this.ACTIVE = index;	*/		
+/*				var $this = this;
+				$this.ACTIVE = index;	*/
 			},
 			btmLine : function(e){
 				$(function(){
@@ -469,7 +494,7 @@
 			        	"transition" : "transform 200ms"
 			        })
 			        $(e.target).addClass('active').siblings('button').removeClass("active");
-			        if($(e.target).index() >= 5){	
+			        if($(e.target).index() >= 5){
 			        	$(".nav-btnBox").scrollLeft(10000);
 			        } else {
 			        	$(".nav-btnBox").scrollLeft(0);

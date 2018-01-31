@@ -39,7 +39,7 @@
 			font-size: .14rem;
 			float: right;
 			height:.5rem;
-			line-height: .5rem; 
+			line-height: .5rem;
 		}
 	}
 	.search-text{
@@ -54,7 +54,7 @@
 			width: .3rem;
 			height: .24rem;
 			background: url("../../../static/images/general_btn_search_normal.png") center no-repeat;
-			background-size: 100% auto;	
+			background-size: 100% auto;
 			position: absolute;
 			top: 0;
 			bottom: 0;
@@ -136,7 +136,7 @@
 	  		<button @click="crShHis(), noSearch = true" v-if="noSearch == false">清除历史搜索</button>
 	  		<span v-else>很干净哦~~</span>
 	  	</p>
-	  	<router-view></router-view>  
+	  	<router-view></router-view>
   	</div>
   </div>
 </template>
@@ -154,34 +154,41 @@
 			}
 		},
 		components:{
-		},	
+		},
 		mounted(){
+			var h = $(window).height();
+			$(window).resize(function(){
+				 $(window).height() < h ?
+				 $("footer").hide() :
+				 $("footer").show();
+			});
+
 			if(this.oldSearchList.length == 0) {
 				this.noSearch = true;
 				return;
-			} 
+			}
+
 			window.localStorage.searchRecord = window.localStorage.searchRecord.replace(/undefined/, "");
 			var arr = window.localStorage.searchRecord.split("---").reverse();
 			this.oldSearchList = this.unique3( arr );
+
 		},
 		watch:{
 			clearSearch(val){
 				$(function(){
 					$(".searchBox input").val("");
 				})
-				
-			}	
+			}
 		},
 		methods :{
-			unique3 : function(array){ 
-				var n = [array[0]]; //结果数组 
-				//从第二项开始遍历 
-				for(var i = 1; i < array.length; i++) { 
-					if (array.indexOf(array[i]) == i) n.push(array[i]); 				
+			unique3 : function(array){
+				var n = [array[0]]; //结果数组
+				//从第二项开始遍历
+				for(var i = 1; i < array.length; i++) {
+					if (array.indexOf(array[i]) == i) n.push(array[i]);
 				}
 				return n;
-			}, 
- 
+			},
 
 		    goback () {
 		      this.$router.goBack()

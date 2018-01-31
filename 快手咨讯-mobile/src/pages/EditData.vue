@@ -103,7 +103,7 @@
 	}
 	</style>
 
-<template>	
+<template>
   <div class="edit-data">
   	<go-back/>
 	<div class="edit-tt">
@@ -149,7 +149,7 @@
 			});
 		},
 		methods:{
-			confirmEdit	:function(e){	
+			confirmEdit	:function(e){
 				var $this = this;
 				var nameVal = $(".user-name input").val();
 				if(nameVal == ""){
@@ -164,7 +164,7 @@
 	                      withCredentials: true
 	                },//跨域 后端存储session时，cookie不能用，发送此凭据
 			     	url: $this.GLOBAL.URL + "index.php/login/update_datum",
-			     	type:"post", 
+			     	type:"post",
 			     	dataType: "json",
 			     	data:{
 			     		"nickname" : nameVal,
@@ -177,13 +177,10 @@
 							window.localStorage.user_head = data.data.head_pic;
 							window.localStorage.user_nickName = data.data.nickname;
 							window.localStorage.user_sign = data.data.sign;
-							$this.$router.push({"path" : '/Personal'});		
+							$this.$router.push({"path" : '/Personal'});
 			     		} else {
 			     			alert(data.errmsg);
 			     		}
-
-						
-		     				     		
 			     	}
 			    });
 			},
@@ -201,7 +198,7 @@
 				    }
 				    if(fil.size > 2 * 1024 * 1024){
 				    	alert("上传的头像不能超过2M");
-				    } 
+				    }
 				    else {
 					    reader.onload = function() {
 					        $('.user-head img')
@@ -218,7 +215,7 @@
 				  }
 			}
 		},
-		components:{			
+		components:{
 			GoBack
 		}
 	}

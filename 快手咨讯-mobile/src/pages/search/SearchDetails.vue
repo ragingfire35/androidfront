@@ -79,7 +79,6 @@
 		height: .8rem;
 		line-height: .8rem;
 	}
-	
 	.newsList{
 		padding: 0 .15rem;
 		li{
@@ -102,7 +101,13 @@
 			color: #303030;
 			height: .38rem;
 			line-height: .22rem;
-			word-break: break-all;		
+		   	display: -webkit-box;
+		    display: -moz-box;
+		    overflow: hidden;
+		    text-overflow: ellipsis;
+		    word-break: break-all;
+		    -webkit-box-orient: vertical;
+		    -webkit-line-clamp:2;
 		}
 	}
 	.news-author-info{
@@ -132,7 +137,7 @@
 
 
 
-<template>	
+<template>
   <div class="SearchDetails">
   	<div class="searchBox">
   		<em></em>
@@ -144,7 +149,7 @@
 
 	<div class="search-details">
 
-		<div class="search-responseBOX" 
+		<div class="search-responseBOX"
 			 v-for="(item, index) in newsDetails"
 			 v-if="item.newsResponse.length"
 		>
@@ -153,7 +158,7 @@
 				<li	v-for="(list, indexIn) in item.newsResponse">
 					<router-link :to="{ path: '/NewsDetails', query: { newsid: list.news_id }}" href="javascript:;">
 						<div class="newsLt">
-							<p class="news-tt">{{list.title | subStrText(28)}}</p>
+							<p class="news-tt">{{list.title}}</p>
 							<p class="news-author-info">
 								<span class="author-name">{{list.admin_id}}</span>
 								<span>&ensp;·&ensp;</span>
@@ -194,7 +199,6 @@
 						newsResponse : []
 					}
 				]
-				
 			}
 		},
 		components:{
@@ -208,11 +212,10 @@
 				$(function(){
 					$(".searchBox input").val("");
 				})
-					
-			},	
-		    isShowMsgFn(e){		
+			},
+		    isShowMsgFn(e){
 		    	var $this = this;
-				$(".noStyle").hide();		    	
+				$(".noStyle").hide();
 		    	if ($.trim( $(e.target).val() ).length == 0) {
 		    		$this.isSearchMsg = false;
 		    	} else{
@@ -237,7 +240,7 @@
 	                      withCredentials: true
 	                },//跨域 后端存储session时，cookie不能用，发送此凭据
 			     	url: $this.GLOBAL.URL + "index.php/News/news_search",
-			     	type:"post", 
+			     	type:"post",
 			     	dataType: "json",
 			     	data:{
 			     		search: searchInfo,
@@ -257,13 +260,13 @@
 			     			var dataTime = date - 1 * 60 * 60 * 1000;//最新
 			     			$.each(data.data,function(i , j){
 		     					j.ctime * 1000 >= dataTime ?
-		     					   $this.newsDetails[0].newsResponse.push(j) : 
+		     					   $this.newsDetails[0].newsResponse.push(j) :
 		     					   $this.newsDetails[1].newsResponse.push(j)
 			     			});
 			     			window.localStorage.searchRecord += searchInfo +  "---";
 							$(function(){
 								$this.GLOBAL.agoTime.render(document.querySelectorAll('.public-time'), 'zh_CN');
-							});	
+							});
 							Indicator.close();
 			     		} else if(data.errno == 1){
 			     		} else if(data.errno == 2){

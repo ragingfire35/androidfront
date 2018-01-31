@@ -32,7 +32,7 @@ import "../static/js/plugIn/rem.js";
         let date = new Date( time );
         return formatDate(date, 'yyyy-MM-dd hh:mm:ss');
     });
-    
+
     // 字数截取
     Vue.filter("subStrText", function(value,setTextNum){
         if (value.length > setTextNum) {

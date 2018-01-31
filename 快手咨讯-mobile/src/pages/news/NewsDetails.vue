@@ -1,5 +1,4 @@
 <style lang="less" scoped>
-	
 	.baseBorderRadius(@radius) {
 	  border-radius: @radius;
 	  -webkit-border-radius: @radius;
@@ -217,7 +216,6 @@
 			display: block;
 			margin: 0 auto;
     		&>span{
-				
     		}
     	}
     }
@@ -246,7 +244,7 @@
 	   	.comment-inputInner{
 	   		width: 100%;
 	   		height: .24rem;
-	   		position: absolute;	
+	   		position: absolute;
 	   		left: 0;
 	   		right: 0;
 	   		margin: 0 auto;
@@ -351,7 +349,7 @@
     			display: block;
     		}
     	}
-    }	
+    }
 </style>
 <style lang="less">
 	.news-main{
@@ -368,7 +366,7 @@
 
 		<p class="comment-fixed">
 			<go-back/>
-			<span>{{authorInfo.introduce}}</span>
+			<span>{{authorInfo.title}}</span>
 		</p>
 		<p class="news-tt">
 			{{newsDetails.title}}
@@ -405,14 +403,14 @@
 					<em></em>
 				</router-link>
 			</div>
-			
+
 			<div class="user-comment-main">
 				<p class="user-comment-tt">
 					<span>精彩评论</span>
 					<span>&nbsp;/&nbsp;</span>
 					<span>{{commentCount}}&nbsp;</span>条评论
 				</p>
-				<ul 
+				<ul
 					class="user-comment-List"
 					v-infinite-scroll="loadMore"
 					infinite-scroll-disabled="loading"
@@ -449,7 +447,7 @@
 				   </p>
 				   <button @click="sendComment($event)">发送</button>
 				</div>
-			</div>			
+			</div>
 		</div>
 	</div>
 </template>
@@ -505,7 +503,7 @@
 		     	data:{
 		     		news_id : $this.$route.query.newsid
 		     	},
-		     	type:"post", 
+		     	type:"post",
 		     	dataType: "json",
 		     	success:function(data){
 		     		if(data.errno == "0"){
@@ -513,9 +511,9 @@
 		     			$this.author_detail();
 		     			$this.getOriginComment($this.moreCommentBtn);
 			     		Indicator.close();
-						$(function(){				
+						$(function(){
 							$("a.face").smohanfacebox({
-								Event : "click",	//触发事件	
+								Event : "click",	//触发事件
 								divid : "Smohan_FaceBox", //外层DIV ID
 								textid : "Smohan_text" //文本框 ID
 							});

@@ -64,7 +64,7 @@
 
 
 
-<template>	
+<template>
   <div class="other-login"  v-title data-title="其他登陆">
   	<p class="other-login-h4">我们不制造新闻，<br/>我们只是&ensp;<span>新闻的搬运工</span>。</p>
 	<div class="other-login-main">
@@ -86,7 +86,6 @@
 			手机号码登录
 	 	</router-link>
 	</div>
-	<home-footer/>
   </div>
 </template>
 
@@ -102,6 +101,6 @@
 		},
 		components:{
 			HomeFooter
-		}	
+		}
 	}
 </script>

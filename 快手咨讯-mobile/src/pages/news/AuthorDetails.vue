@@ -64,6 +64,7 @@
 	}
 	.publicNews-tt{
 		font-size: .15rem;
+		font-weight: bold;
 		color: #303030;
 		letter-spacing: .01rem;
 		word-break: break-all;
@@ -87,6 +88,7 @@
 </style>
 <template>
 	<div class="author-details" v-if="authorInfo.username">
+		<go-back/>
 		<div class="banner">
 			<img :src="basePath + authorInfo.head_pic" alt="">
 			<div class="author-info">
@@ -125,6 +127,7 @@
 	</div>
 </template>
 <script>
+	import GoBack from '@/components/GoBack';
 	import { Indicator } from 'mint-ui';
 	export default{
 		data(){
@@ -134,6 +137,9 @@
 				authorDetail : []
 			}
 		},
+        components:{
+            GoBack
+        },
 		mounted(){
             Indicator.open({
               text: '加载中...',
@@ -148,14 +154,13 @@
 		     	data:{
 		     		news_id : $this.$route.query.newsid
 		     	},
-		     	type:"post", 
+		     	type:"post",
 		     	dataType: "json",
 		     	success:function(data){
 		     		if(data.errno == "0"){
 		     			Indicator.close();
 		     			$this.authorInfo = data.data.admin_detail;
 		     			$this.authorDetail = data.data.news_list;
-		     		
 						$(function(){
 							$this.GLOBAL.agoTime.render(document.querySelectorAll('.a_public_time'), 'zh_CN');
 							$(".banner img").jqthumb({

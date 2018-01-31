@@ -38,7 +38,7 @@
 			height: .51rem;
 			overflow: hidden;
 			border-bottom: 1px #e5e5e5 solid;
-			
+
 			&>span{
 				float: left;
 				height: 100%;
@@ -98,7 +98,7 @@
 	}
 </style>
 
-<template>	
+<template>
   <div class="perfect-account">
 	<go-back/>
   	<h4 class="perfect-tt">完善账号</h4>
@@ -107,7 +107,7 @@
 			<span>用户头像</span>
 			<div class="userHead-img">
 				<img src="../../static/images/edit_img_head_default.png" alt="">
-				<input type="file" class="userHead-file" @change="uploadHeadImg($event)">	
+				<input type="file" class="userHead-file" @change="uploadHeadImg($event)">
 			</div>
 		</div>
 
@@ -132,6 +132,11 @@
 			}
 		},
 		mounted(){
+			$(window).resize(function(){
+				 $(window).height() < h ?
+				 $("footer").hide() :
+				 $("footer").show();
+			})
 		},
 
 		components:{
@@ -165,7 +170,7 @@
 	                      withCredentials: true
 	                },//跨域 后端存储session时，cookie不能用，发送此凭据
 			     	url: $this.GLOBAL.URL + "index.php/login/perfect_datum",
-			     	type:"post", 
+			     	type:"post",
 			     	dataType:"json",
 			     	data:{
 			     		"head_pic" : head_pic,
@@ -184,8 +189,8 @@
 				window.localStorage.IsLoginIn = 'true';
 				window.localStorage.user_head = data.data.head_pic;
 				window.localStorage.user_nickName = data.data.nickname;
-				data.data.sign == "" ? 
-				window.localStorage.user_sign = "暂无个人简介" : 
+				data.data.sign == "" ?
+				window.localStorage.user_sign = "暂无个人简介" :
 				window.localStorage.user_sign = data.data.sign;
 				this.$router.push({'path': '/Personal'});
 			},
