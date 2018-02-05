@@ -78,13 +78,13 @@
 		margin-bottom: 1rem;
 	}
 	.carousel-img{
-		width: 3.3rem;
+		width: 100%;
 		height: 1.8rem;
 		display: block;
 		margin: 0 auto;
 	}
 	.carousel-mask{
-		width: 3.3rem;
+		width: 100%;
 		height: 100%;
 		position: absolute;
 		background: rgba(0,0,0,.2);
@@ -96,6 +96,7 @@
 	.carousel-text{
 		font-size: .14rem;
 		height: .14rem;
+		line-height: .14rem;
 		color: #fff;
 		position: absolute;
 		left: 0;
@@ -104,6 +105,8 @@
 		bottom: .16rem;
 		padding: 0 .28rem;
     	word-break: break-all;
+    	overflow: hidden;
+    	text-overflow: ellipsis;
 	}
 
 	.newsList{
@@ -168,14 +171,7 @@
 		color: #FF8000;
 	}
 </style>
-<style>
-	.wc-swiper-container{
-		transform: scaleX(.9);
-		overflow: visible;
-	}
-	.wc-slide{
-		padding: 0 .03rem;
-	}
+<style lang="less">
 	.mint-cell{
 		background: #fff!important;
 	}
@@ -201,7 +197,21 @@
 		color: #FF8000;
 	}
 	.mint-tab-container-wrap{
-		min-height: 1rem;
+		min-height: 3rem;
+	}
+	 .wc-slide{
+	 	&:nth-of-type(1){
+	 		width: 90%;
+	 		transform: translateX(15%);
+	 	}
+	 	&:nth-of-type(2){
+	 		width: 90%;
+	 		transform: translateX(16.5%);
+	 	}
+	 	&:nth-of-type(3){
+	 		width: 90%;
+	 		transform: translateX(18%);
+	 	}
 	}
 </style>
 
@@ -228,7 +238,7 @@
 			:autoplay='true'
 			ref="swiper"
 			:pagination="false"
-			@transitionend="fn"
+			@transitionend="current"
 			v-if="banner.length"
 		>
 		    <wc-slide
@@ -241,7 +251,7 @@
 					<router-link :to="{ path: '/NewsDetails', query: { newsid: item.news_id }}" href="javascript:;">
 						<img v-lazy="basePath + item.cover_img" alt="" class="carousel-img">
 						<div class="carousel-mask">
-							<p class="carousel-text">{{item.title | subStrText(20)}}</p>
+							<p class="carousel-text">{{item.title}}</p>
 						</div>
 					</router-link>
 				</div>
@@ -325,13 +335,13 @@
 				ACTIVE : 0,
 				basePath : this.GLOBAL.__PUBLIC__ ,
 				banner : [],
-				category : ["aa"],
+				category : [],
 				cateNews: [],
 				newspageNumber : [],
 				moreNewsBtn : false,
 				loading : false,
 				topStatus : '',
-				allLoaded: false,
+				allLoaded: false
 			}
 		},
 		components:{
@@ -388,6 +398,8 @@
 					Indicator.close();
 		     	}
 		    })
+		    Indicator.close();
+		    this.touch();
 		},
 		methods:{
 			loadMore() {
@@ -400,7 +412,7 @@
 			  setTimeout(() => {
 					$(".load-more-newsBtn").trigger('click');
 					$this.loading = false;
-			  }, 1000)
+			  }, 500)
 
 			},
 			loadTop(){
@@ -479,9 +491,11 @@
 			    });
 
 			},
-			fn : function(){
-/*				var $this = this;
-				$this.ACTIVE = index;	*/
+			current : function(currentSlide){
+				$(".wc-slide").css({ "width": "100%", "transform": "translateX(0%)"})
+				$(".wc-slide").eq(currentSlide).css({ "width": "90%", "transform": "translateX(15%)"})
+				$(".wc-slide").eq(currentSlide+2).css({ "width": "90%", "transform": "translateX(18%)"})
+				$(".wc-slide").eq(currentSlide+1).css({ "width": "90%", "transform": "translateX(16.5%)"})
 			},
 			btmLine : function(e){
 				$(function(){

@@ -37,8 +37,7 @@ export default new Router({
             meta: {
               footerShow : true
             }
-            
-          },           
+          },
           {
             path: '/Search',
             name: 'Search',
@@ -47,8 +46,8 @@ export default new Router({
               footerShow : true
             }
           },
-          { 
-            path: "/Search/SearchDetails", 
+          {
+            path: "/Search/SearchDetails",
             name: "SearchDetails",
             component: SearchDetails,
             meta: {
@@ -78,7 +77,7 @@ export default new Router({
             meta: {
               footerShow : true
             }
-          }, 
+          },
           {
             path: '/loginIn',
             name: 'loginIn',
@@ -86,7 +85,7 @@ export default new Router({
             meta: {
               footerShow : true
             }
-          }, 
+          },
           {
             path: '/EditData',
             name: 'EditData',

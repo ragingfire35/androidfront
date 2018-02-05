@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title> </title>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.js"></script>
+</head>
+<style type="text/css">
+.box {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  margin: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: red;
+  opacity: 0.6;
+  color: black;
+}
+</style>
+
+<body>
+  <div class="box" id="box">dssdfsdfsdffffffffffffffffffffffffffffffffs</div>
+</body>
+<script type="text/javascript">
+	document.body.ontouchstart = function(e) {
+	    stopDefault(e);
+	    startX = e.changedTouches[0].pageX,
+	    startY = e.changedTouches[0].pageY;
+	};
+	document.body.ontouchmove = function(e) {
+	    stopDefault(e);
+	    moveEndX = e.changedTouches[0].pageX,
+	    moveEndY = e.changedTouches[0].pageY,
+	    X = moveEndX - startX,
+	    Y = moveEndY - startY;
+	    if ( Math.abs(X) > Math.abs(Y) && X > 0 ) {
+	        alert("left 2 right");
+	    }
+	    else if ( Math.abs(X) > Math.abs(Y) && X < 0 ) {
+	        alert("right 2 left");
+	    }
+	    else if ( Math.abs(Y) > Math.abs(X) && Y > 0) {
+	        alert("top 2 bottom");
+	    }
+	    else if ( Math.abs(Y) > Math.abs(X) && Y < 0 ) {
+	        alert("bottom 2 top");
+	    }
+	    else{
+	        alert("just touch");
+	    }
+	};
+	//阻止浏览器的默认行为 
+	function stopDefault( e ) { 
+	    //阻止默认浏览器动作(W3C) 
+	    if ( e && e.preventDefault ) 
+	        e.preventDefault(); 
+	    //IE中阻止函数器默认动作的方式 
+	    else
+	        window.event.returnValue = false; 
+	    return false; 
+	}
+</script>
+
+</html>

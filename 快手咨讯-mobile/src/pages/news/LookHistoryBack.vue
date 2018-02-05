@@ -43,14 +43,12 @@
     .look-section{
         width: 100%;
         &>p{
-            padding: 0 .15rem;
             font-size: .12rem;
             color: #AAAAAA;
             text-align: left;
             width: 100%;
             height: .5rem;
             line-height: .5rem;
-
         }
     }
     .newsList{
@@ -69,9 +67,27 @@
             &:last-of-type{
                 margin-bottom: 0;
             }
+            i{
+                float: left;
+                width:.82rem;
+                height: .82rem;
+                text-align:center;
+                background-color:#E2421B;
+                position: relative;
+                img{
+                    display: block;
+                    width: .26rem;
+                    position: absolute;
+                    top: 0;
+                    bottom: 0;
+                    left: 0;
+                    right: 0;
+                    margin: auto;
+                }
+
+            }
         }
     }
-
     .newsLt{
         float: left;
         width: 2.2rem;
@@ -85,21 +101,14 @@
             color: #303030;
             line-height: .22rem;
             margin-top: -.04rem;
-            display: -webkit-box;
-            display: -moz-box;
-            overflow: hidden;
-            text-overflow: ellipsis;
             word-break: break-all;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp:2;
-            text-align: justify;
         }
     }
     .news-author-info{
         color: #a8a8a8;
         font-size: .12rem;
         text-align: left;
-        margin-top: .1rem;
+        margin-top: .08rem;
     }
     .newsRt{
         width: .94rem;
@@ -130,10 +139,10 @@
     }
     .LookHistory{
         width: 100%;
+        padding: 0 .15rem;
         overflow: hidden;
     }
     .Look-history-top{
-        padding: 0 .15rem;
         height: .5rem;
         width: 100%;
         line-height: .5rem;
@@ -183,32 +192,6 @@
         text-indent: .08rem;
     }
 </style>
-<style lang="less">
-    .mint-cell-value{
-        min-height: 0!important;
-    }
-    img.del_LOGO{
-        display: block;
-        width: .26rem;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
-    }
-    .mint-cell-right{
-        width: .82rem;
-        height: .82rem;
-        background-color : #FF5050;
-    }
-    .newsList{
-        .mint-cell-wrapper{
-            padding: .1rem .15rem!important;
-        }
-    }
-
-</style>
 <template>
     <div class="LookHistory">
         <go-back/>
@@ -217,44 +200,30 @@
             <button @click="dialogToggle" >清除全部</button>
         </div>
     	<div class="look-main" v-if="isShow === true">
-            <div class="look-section" v-for="(item,index) in list" :key="index">
-                    <p v-if="item.content.length">{{item.lookTime}}</p>
-                    <div class="page-cell newsList">
-                        <mt-cell-swipe
-                          v-for="(one, j) in item.content"
-                          :key = "j"
-                          :right="
-                                [
-                                    {
-                                        content: '<img src=./static/images/del.png class=del_LOGO>',
-                                        style: {height: '100%',width: '.82rem',display: 'block',padding: '0',fontSize : '14px'},
-                                        handler(){
-                                            delTheDateBase(0, one.news_id, one, j, index)
-                                        }
-                                    }
-                                ]
-                          "
-
-                        >
-                            <router-link :to="{ path: '/NewsDetails', query: { newsid: one.news_id }}" href="javascript:;">
-                                <div class="newsLt">
-                                    <p class="news-tt">{{one.title}}</p>
-                                     <p class="news-author-info">
-                                        <span class="author-name">{{one.admin_id}}</span>
-                                        <span>&ensp;·&ensp;</span>
-                                        <span class="public-time" :data-timeago="parseInt(one.ctime+'000') | formatDate"></span>
-                                        <span>&ensp;·&ensp;</span>
-                                        <span class="news-source">{{one.source}}</span>
-                                    </p>
-                                </div>
-                                <div class="newsRt">
-                                    <img v-lazy="basePath + one.cover_img" alt="">
-                                </div>
-                            </router-link>
-                            <i @click="delTheDateBase(0, one.news_id, one, j, index)" class="delBtn"></i>
-                        </mt-cell-swipe>
-                    </div>
-
+            <div class="look-section" v-for="(item,index) in list">
+                <p v-if="item.content.length">{{item.lookTime}}</p>
+                <ul class="newsList">
+                    <li v-for="(one, j) in item.content">
+                        <router-link :to="{ path: '/NewsDetails', query: { newsid: one.news_id }}" href="javascript:;">
+                            <div class="newsLt">
+                                <p class="news-tt">{{one.title | subStrText(28)}}</p>
+                                <p class="news-author-info">
+                                    <span class="author-name">{{one.admin_id}}</span>
+                                    <span>&ensp;·&ensp;</span>
+                                    <span class="public-time" :data-timeago="parseInt(one.ctime+'000') | formatDate"></span>
+                                    <span>&ensp;·&ensp;</span>
+                                    <span class="news-source">{{one.source}}</span>
+                                </p>
+                            </div>
+                            <div class="newsRt">
+                                <img v-lazy="basePath + one.cover_img" alt="">
+                            </div>
+                        </router-link>
+                        <i @click="delTheDateBase(0, one.news_id, one, j, index)">
+                             <img src="../../../static/images/del.png" alt="">
+                        </i>
+                    </li>
+                </ul>
             </div>
         </div>
 
@@ -290,22 +259,14 @@
                             content :[]
                         }
 	            ],
+	            expansion : null,	//是否存在展开的list
+                sliderConf:{//滑动配置
+                    distance:.82
+                },
         	}
         },
         components:{
             GoBack
-        },
-        created() {
-          var $this = this;
-          $this.rightButtons = [
-            {
-                content: '<img class="del_LOGO" src="./static/images/del.png">',
-                style: {height: '100%',width: '.82rem',display: 'block',padding: '0',fontSize : '14px'},
-                handler(){
-                    $(".delBtn").trigger("click");
-                }
-            }
-          ];
         },
         watch:{
             list(val){
@@ -320,7 +281,6 @@
               spinnerType: 'fading-circle'
             });
             var $this=this;
-
             $.ajax({
                 xhrFields: {
                       withCredentials: true
@@ -331,24 +291,67 @@
                 success:function(data){
                     $.each(data.data, function(i, j){
                         if(j.ctime){
-                            data.data.current_time < j.ctime ?//今天凌晨 < 浏览的时间 // 此处 j.ctime是发布时间，少一个字段
-                                $this.list[0].content.push(j) ://今天
-                                $this.list[1].content.push(j)//以前
+                            data.data.current_time < j.ctime ?
+                                $this.list[0].content.push(j) :
+                                $this.list[1].content.push(j)
                         }
                     });
                     if( $this.list[1].content.length == 0){
                         $this.isShow = false;
                     } else {
                         $this.isShow = true;
+                        $this.setting();
                     }
                     Indicator.close();
                 }
             });
-            Indicator.close();
+
+
         },
         methods:{
+            setting : function(){
+                var $this = this;
+                $(function(){
+                    $this.GLOBAL.agoTime.render(document.querySelectorAll('.public-time'), 'zh_CN');
+                    //将$this保存 区分以下触发事件的this
+                    var container = document.querySelectorAll('.newsList li');
+                    for(var i = 0; i < container.length; i++){
+                        //为每个特定DOM元素绑定touchstart touchmove时间监听 判断滑动方向
+                        var x,  X;
+                        container[i].addEventListener('touchstart', function(event) {
+                            //记录初始触控点横坐标
+                            x = event.changedTouches[0].pageX;
+                        });
+                        container[i].addEventListener('touchmove', function(event){
+                            X = event.changedTouches[0].pageX;
+                                //记录当前触控点横坐标
+                            if($this.expansion){
+                                //判断是否展开，如果展开则收起
+                                $this.expansion.className = "swipeRight";
+                            }
+                            if(X - x > 10){
+                                //右滑
+                                this.className = "swipeRight";
+                                //右滑收起
+                            }
+                            else if(x - X > 10){
+                                //左滑
+                                this.className = "swipeleft";
+                                //左滑展开
+                                $this.expansion = this;
+                            }
+                        });
+                    }
+                });
+            },
+
             del:function(one,j,index){
                 this.list[index].content.splice(j,1);
+                 //删除List这条数据 DOM随之更新渲染
+                var container = document.querySelector('.swipeleft');
+                //将展开的DOM归位 除掉样式类
+                container.className="swipeRight";
+                this.expansion=null;
                 if(this.list[1].content.length == 0){
                     this.isShow = false;
                 }
@@ -373,7 +376,6 @@
                     dataType: "json",
                     success:function(data){
                         if (data.errno == 0) {
-
                             let instance = Toast({
                                 message : '删除成功',
                                 position : "bottom"
